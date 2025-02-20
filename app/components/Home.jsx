@@ -1,7 +1,38 @@
-import { TouchableOpacity, Text, View, Platform } from 'react-native';
+import React from 'react';
+import { TouchableOpacity, Text, View, Platform, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 import { useUser } from '../context/UserContext.jsx';
 import { useNavigation } from '@react-navigation/native';
+
+const COLORS = {
+  white: '#FFFFFF'
+};
+
+const styles = StyleSheet.create({
+  button: {
+    marginTop: 20,
+    minHeight: 50,
+    paddingHorizontal: 20,
+    paddingVertical: 10
+  },
+  buttonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    textAlign: 'center'
+  },
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24
+  },
+  welcomeText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    margin: 24,
+    marginTop: 0,
+    textAlign: 'center'
+  }
+});
 
 export default function Home() {
   const { username, setUsername } = useUser();
@@ -35,15 +66,10 @@ export default function Home() {
       <Button
         mode="contained"
         onPress={handleLogIn}
-        style={{
-          marginTop: 20,
-          paddingVertical: 10,
-          paddingHorizontal: 20,
-          minHeight: 50,
-        }}
-        labelStyle={{ fontSize: 16, textAlign: 'center', color: 'white' }}
+        style={styles.button}
+        labelStyle={styles.buttonText}
       >
-        Log In
+        <Text>Log In</Text>
       </Button>
     );
   };
@@ -63,15 +89,10 @@ export default function Home() {
       <Button
         mode="contained"
         onPress={handleLogOut}
-        style={{
-          marginTop: 20,
-          paddingVertical: 10,
-          paddingHorizontal: 20,
-          minHeight: 50,
-        }}
-        labelStyle={{ fontSize: 16, textAlign: 'center', color: 'white' }}
+        style={styles.button}
+        labelStyle={styles.buttonText}
       >
-        Log Out
+        <Text>Log Out</Text>
       </Button>
     );
   };
@@ -91,32 +112,17 @@ export default function Home() {
       <Button
         mode="contained"
         onPress={navigateWeather}
-        style={{
-          marginTop: 20,
-          paddingVertical: 10,
-          paddingHorizontal: 20,
-          minHeight: 50,
-        }}
-        labelStyle={{ fontSize: 16, textAlign: 'center', color: 'white' }}
+        style={styles.button}
+        labelStyle={styles.buttonText}
       >
-        Weather
+        <Text>Weather</Text>
       </Button>
     );
   };
 
   return (
-    <View
-      style={{ alignItems: 'center', justifyContent: 'center', padding: 24 }}
-    >
-      <Text
-        style={{
-          margin: 24,
-          marginTop: 0,
-          fontSize: 14,
-          fontWeight: 'bold',
-          textAlign: 'center',
-        }}
-      >
+    <View style={styles.container}>
+      <Text style={styles.welcomeText}>
         {username ? `Welcome, ${username}!` : 'Please log in!'}
         {'\n'}
         {username ? <LogOut /> : <LogIn />}

@@ -1,4 +1,4 @@
-import { Text, SafeAreaView, StyleSheet } from 'react-native';
+import React from 'react';
 
 import Home from './app/components/Home.jsx';
 import LogIn from './app/components/LogIn.jsx';

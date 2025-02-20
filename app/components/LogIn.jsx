@@ -4,6 +4,7 @@ import { Button, TextInput, HelperText, Title } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from '../context/UserContext.jsx';
 import { TouchableOpacity } from 'react-native';
+import { COLORS } from '../../constants/COLORS';
 
 export default function LogIn() {
   const [username, setFormUsername] = useState('');
@@ -62,14 +63,16 @@ export default function LogIn() {
         style={styles.button}
         labelStyle={styles.buttonText}
       >
-        Login
+        <Text style={styles.buttonText}>Login</Text>
       </Button>
     );
   };
 
   return (
     <View style={styles.container}>
-      <Title style={styles.title}>Login</Title>
+      <Title style={styles.title}>
+        <Text>Login</Text>
+      </Title>
       <TextInput
         label="Username"
         value={username}
@@ -83,7 +86,7 @@ export default function LogIn() {
       />
       {usernameError && (
         <HelperText type="error" visible={usernameError}>
-          Username is required.
+          <Text>Username is required.</Text>
         </HelperText>
       )}
 
@@ -98,7 +101,7 @@ export default function LogIn() {
       />
       {passwordError && (
         <HelperText type="error" visible={passwordError}>
-          Password is required.
+          <Text>Password is required.</Text>
         </HelperText>
       )}
       {renderButton()}
@@ -107,32 +110,32 @@ export default function LogIn() {
 }
 
 const styles = StyleSheet.create({
+  button: {
+    alignItems: 'center',
+    backgroundColor: COLORS.primary,
+    borderRadius: 5,
+    justifyContent: 'center',
+    marginTop: 20,
+    minHeight: 50,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  buttonText: {
+    color: COLORS.white,
+    fontFamily: 'Arial',
+    fontSize: 16,
+    textAlign: 'center',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     padding: 20,
   },
-  title: {
-    textAlign: 'center',
-    marginBottom: 20,
-  },
   input: {
     marginBottom: 10,
   },
-  button: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    minHeight: 50,
-    backgroundColor: '#6200ee',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 5,
-  },
-  buttonText: {
-    fontSize: 16,
+  title: {
+    marginBottom: 20,
     textAlign: 'center',
-    color: 'white',
-    fontFamily: 'Arial',
   },
 });
