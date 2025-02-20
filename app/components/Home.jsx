@@ -5,19 +5,19 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function Home() {
   const { username, setUsername } = useUser();
-  const navigation = useNavigation(); 
+  const navigation = useNavigation();
 
   const handleLogIn = () => {
     navigation.navigate('LogIn');
   };
 
   const handleLogOut = () => {
-    setUsername(null); 
-    navigation.navigate('Home'); 
+    setUsername(null);
+    navigation.navigate('Home');
   };
 
   const navigateWeather = () => {
-    navigation.navigate('Weather'); 
+    navigation.navigate('Weather');
   };
 
   const LogIn = () => {
@@ -35,7 +35,12 @@ export default function Home() {
       <Button
         mode="contained"
         onPress={handleLogIn}
-        style={{ marginTop: 20, paddingVertical: 10, paddingHorizontal: 20, minHeight: 50 }}
+        style={{
+          marginTop: 20,
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+          minHeight: 50,
+        }}
         labelStyle={{ fontSize: 16, textAlign: 'center', color: 'white' }}
       >
         Log In
@@ -58,7 +63,12 @@ export default function Home() {
       <Button
         mode="contained"
         onPress={handleLogOut}
-        style={{ marginTop: 20, paddingVertical: 10, paddingHorizontal: 20, minHeight: 50 }}
+        style={{
+          marginTop: 20,
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+          minHeight: 50,
+        }}
         labelStyle={{ fontSize: 16, textAlign: 'center', color: 'white' }}
       >
         Log Out
@@ -81,7 +91,12 @@ export default function Home() {
       <Button
         mode="contained"
         onPress={navigateWeather}
-        style={{ marginTop: 20, paddingVertical: 10, paddingHorizontal: 20, minHeight: 50 }}
+        style={{
+          marginTop: 20,
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+          minHeight: 50,
+        }}
         labelStyle={{ fontSize: 16, textAlign: 'center', color: 'white' }}
       >
         Weather
@@ -90,9 +105,19 @@ export default function Home() {
   };
 
   return (
-    <View style={{ alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-      <Text style={{ margin: 24, marginTop: 0, fontSize: 14, fontWeight: 'bold', textAlign: 'center' }}>
-        {username ? `Welcome, ${username}!` : "Please log in!"}
+    <View
+      style={{ alignItems: 'center', justifyContent: 'center', padding: 24 }}
+    >
+      <Text
+        style={{
+          margin: 24,
+          marginTop: 0,
+          fontSize: 14,
+          fontWeight: 'bold',
+          textAlign: 'center',
+        }}
+      >
+        {username ? `Welcome, ${username}!` : 'Please log in!'}
         {'\n'}
         {username ? <LogOut /> : <LogIn />}
         {username ? <Weather /> : ''}

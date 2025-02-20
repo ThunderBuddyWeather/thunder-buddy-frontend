@@ -10,7 +10,7 @@ export default function LogIn() {
   const [password, setFormPassword] = useState('');
   const [usernameError, setFormUsernameError] = useState(false);
   const [passwordError, setFormPasswordError] = useState(false);
-  const navigation = useNavigation(); 
+  const navigation = useNavigation();
   const { setUsername } = useUser();
 
   const handleLogin = async () => {
@@ -36,7 +36,7 @@ export default function LogIn() {
       if (response.ok) {
         setUsername(username);
         navigation.navigate('Home');
-        console.log('successfully logged in', data)
+        console.log('successfully logged in', data);
       } else {
         console.log('Login failed');
       }
@@ -50,10 +50,7 @@ export default function LogIn() {
   const renderButton = () => {
     if (Platform.OS === 'ios') {
       return (
-        <TouchableOpacity
-          onPress={handleLogin}
-          style={styles.button}
-        >
+        <TouchableOpacity onPress={handleLogin} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       );
@@ -76,7 +73,7 @@ export default function LogIn() {
       <TextInput
         label="Username"
         value={username}
-        onChangeText={(text) => setFormUsername(text)}
+        onChangeText={text => setFormUsername(text)}
         mode="outlined"
         keyboardType="default"
         autoCapitalize="none"
@@ -93,7 +90,7 @@ export default function LogIn() {
       <TextInput
         label="Password"
         value={password}
-        onChangeText={(text) => setFormPassword(text)}
+        onChangeText={text => setFormPassword(text)}
         mode="outlined"
         secureTextEntry
         error={passwordError}
@@ -124,18 +121,18 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 20,
-    paddingVertical: 10,  
-    paddingHorizontal: 20,  
-    minHeight: 50, 
-    backgroundColor: '#6200ee', 
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    minHeight: 50,
+    backgroundColor: '#6200ee',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 5, 
+    borderRadius: 5,
   },
   buttonText: {
     fontSize: 16,
     textAlign: 'center',
-    color: 'white', 
+    color: 'white',
     fontFamily: 'Arial',
   },
 });

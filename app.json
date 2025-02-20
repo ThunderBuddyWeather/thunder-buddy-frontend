@@ -36,9 +36,6 @@
           "backgroundColor": "#ffffff"
         }
       ]
-<<<<<<< HEAD
-    ]
-=======
     ],
     "experiments": {
       "typedRoutes": true
@@ -52,6 +49,5 @@
       }
     },
     "owner": "aasimsyed"
->>>>>>> develop
   }
 }

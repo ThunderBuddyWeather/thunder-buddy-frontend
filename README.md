@@ -1,4 +1,4 @@
-```
+````
 # ThunderBuddyFrontend
 
 ThunderBuddyFrontend is an Expo-based React Native application that provides a simple login and home screen. It uses React Navigation for manual routing, React Native Paper for UI components, and NativeWind for Tailwind CSS styling.
@@ -29,15 +29,18 @@ Follow these instructions to clone the repository and set up the project for loc
    ```bash
    git clone <repository-url>
    cd ThunderBuddyFrontend
-   ```
+````
 
 2. **Install Dependencies**
 
    Using npm:
+
    ```bash
    npm install
    ```
+
    Or using yarn:
+
    ```bash
    yarn install
    ```
@@ -47,8 +50,9 @@ Follow these instructions to clone the repository and set up the project for loc
    Make sure you have the following configuration files in your project root:
 
    **babel.config.js**
+
    ```js
-   module.exports = function(api) {
+   module.exports = function (api) {
      api.cache(true);
      return {
        presets: ['babel-preset-expo'],
@@ -58,13 +62,14 @@ Follow these instructions to clone the repository and set up the project for loc
    ```
 
    **tailwind.config.js**
+
    ```js
    /** @type {import('tailwindcss').Config} */
    module.exports = {
      content: [
-       "./App.{js,jsx,ts,tsx}",
-       "./components/**/*.{js,jsx,ts,tsx}",
-       "./screens/**/*.{js,jsx,ts,tsx}"
+       './App.{js,jsx,ts,tsx}',
+       './components/**/*.{js,jsx,ts,tsx}',
+       './screens/**/*.{js,jsx,ts,tsx}',
      ],
      theme: {
        extend: {},
@@ -74,6 +79,7 @@ Follow these instructions to clone the repository and set up the project for loc
    ```
 
    **postcss.config.js**
+
    ```js
    module.exports = {
      plugins: {
@@ -86,9 +92,11 @@ Follow these instructions to clone the repository and set up the project for loc
 4. **Run the Project**
 
    Start the Expo development server and clear the cache:
+
    ```bash
    npx expo start -c
    ```
+
    This command will launch Expo and provide options to open the app on an Android emulator, iOS simulator, or on a physical device via QR code.
 
 ## Project Structure
@@ -136,4 +144,7 @@ ThunderBuddyFrontend/
 ## License
 
 This project is open source and available under the [MIT License](LICENSE).
+
+```
+
 ```
