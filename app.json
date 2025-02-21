@@ -4,7 +4,7 @@
     "slug": "ThunderBuddyFrontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": null,
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
@@ -24,13 +24,13 @@
     },
     "web": {
       "bundler": "metro",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": null
     },
     "plugins": [
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": null,
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"

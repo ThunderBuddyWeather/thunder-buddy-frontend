@@ -1,11 +1,17 @@
 import React from 'react';
-import { TouchableOpacity, Text, View, Platform, StyleSheet } from 'react-native';
+import {
+  TouchableOpacity,
+  Text,
+  View,
+  Platform,
+  StyleSheet,
+} from 'react-native';
 import { Button } from 'react-native-paper';
 import { useUser } from '../context/UserContext.jsx';
 import { useNavigation } from '@react-navigation/native';
 
 const COLORS = {
-  white: '#FFFFFF'
+  white: '#FFFFFF',
 };
 
 const styles = StyleSheet.create({
@@ -13,25 +19,25 @@ const styles = StyleSheet.create({
     marginTop: 20,
     minHeight: 50,
     paddingHorizontal: 20,
-    paddingVertical: 10
+    paddingVertical: 10,
   },
   buttonText: {
     color: COLORS.white,
     fontSize: 16,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24
+    padding: 24,
   },
   welcomeText: {
     fontSize: 14,
     fontWeight: 'bold',
     margin: 24,
     marginTop: 0,
-    textAlign: 'center'
-  }
+    textAlign: 'center',
+  },
 });
 
 export default function Home() {
