@@ -26,6 +26,6 @@ jobs:
         run: npm install -g eas-cli
 
       - name: Build iOS App with EAS
-        run: eas build --platform ios --non-interactive --verbose
+        run: eas build --platform ios --non-interactive --build-logger-level=debug
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
