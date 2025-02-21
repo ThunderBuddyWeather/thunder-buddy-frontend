@@ -26,6 +26,6 @@ jobs:
         run: npm install -g eas-cli
 
       - name: Build Android App with EAS
-        run: eas build --platform android --non-interactive
+        run: eas build --platform android --non-interactive --verbose
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
