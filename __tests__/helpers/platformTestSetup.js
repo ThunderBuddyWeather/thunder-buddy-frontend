@@ -1,8 +1,9 @@
 import { COLORS } from '../../constants/COLORS';
 import { styles } from '../../constants/styles';
-import { fireEvent } from '@testing-library/react-native';
+import { describe, it, expect, beforeEach, jest, fireEvent } from '@jest/globals';
 import { renderWithProvider } from './testUtils';
 import Home from '../../app/components/Home';
+import React from 'react';
 
 // Platform-specific test configurations
 const platformConfigs = {
