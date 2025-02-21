@@ -18,8 +18,7 @@
     "android": {
       "package": "com.thunderbuddy.frontend",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FFFFFF"
       }
     },
     "web": {

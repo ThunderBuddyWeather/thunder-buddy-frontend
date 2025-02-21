@@ -9,13 +9,11 @@ import {
 import { Button } from 'react-native-paper';
 import { useUser } from '../context/UserContext.jsx';
 import { useNavigation } from '@react-navigation/native';
-
-const COLORS = {
-  white: '#FFFFFF',
-};
+import { COLORS } from '../../constants/COLORS';
 
 const styles = StyleSheet.create({
   button: {
+    borderRadius: 4,
     marginTop: 20,
     minHeight: 50,
     paddingHorizontal: 20,
@@ -61,6 +59,7 @@ export default function Home() {
     if (Platform.OS === 'ios') {
       return (
         <TouchableOpacity
+          testID="login-button"
           onPress={handleLogIn}
           className="bg-blue-600 py-3 px-4 rounded mt-5"
         >
@@ -69,14 +68,17 @@ export default function Home() {
       );
     }
     return (
-      <Button
-        mode="contained"
+      <TouchableOpacity
+        testID="login-button"
         onPress={handleLogIn}
-        style={styles.button}
-        labelStyle={styles.buttonText}
+        style={{
+          ...styles.button,
+          backgroundColor: COLORS.secondary,
+          contentStyle: { minWidth: 100 },
+        }}
       >
-        <Text>Log In</Text>
-      </Button>
+        <Text style={styles.buttonText}>Log In</Text>
+      </TouchableOpacity>
     );
   };
 
@@ -84,6 +86,7 @@ export default function Home() {
     if (Platform.OS === 'ios') {
       return (
         <TouchableOpacity
+          testID="logout-button"
           onPress={handleLogOut}
           className="bg-red-600 py-3 px-4 rounded mt-5"
         >
@@ -92,14 +95,17 @@ export default function Home() {
       );
     }
     return (
-      <Button
-        mode="contained"
+      <TouchableOpacity
+        testID="logout-button"
         onPress={handleLogOut}
-        style={styles.button}
-        labelStyle={styles.buttonText}
+        style={{
+          ...styles.button,
+          backgroundColor: COLORS.danger,  // Use theme color
+          contentStyle: { minWidth: 100 },
+        }}
       >
-        <Text>Log Out</Text>
-      </Button>
+        <Text style={styles.buttonText}>Log Out</Text>
+      </TouchableOpacity>
     );
   };
 
@@ -107,6 +113,7 @@ export default function Home() {
     if (Platform.OS === 'ios') {
       return (
         <TouchableOpacity
+          testID="weather-button"
           onPress={navigateWeather}
           className="bg-blue-600 py-3 px-4 rounded mt-5"
         >
@@ -115,14 +122,17 @@ export default function Home() {
       );
     }
     return (
-      <Button
-        mode="contained"
+      <TouchableOpacity
+        testID="weather-button"
         onPress={navigateWeather}
-        style={styles.button}
-        labelStyle={styles.buttonText}
+        style={{
+          ...styles.button,
+          backgroundColor: COLORS.primary,  // Use existing theme color
+          contentStyle: { minWidth: 100 },
+        }}
       >
-        <Text>Weather</Text>
-      </Button>
+        <Text style={styles.buttonText}>Weather</Text>
+      </TouchableOpacity>
     );
   };
 
@@ -130,10 +140,15 @@ export default function Home() {
     <View style={styles.container}>
       <Text style={styles.welcomeText}>
         {username ? `Welcome, ${username}!` : 'Please log in!'}
-        {'\n'}
-        {username ? <LogOut /> : <LogIn />}
-        {username ? <Weather /> : ''}
       </Text>
+      {username ? (
+        <>
+          <LogOut />
+          <Weather />
+        </>
+      ) : (
+        <LogIn />
+      )}
     </View>
   );
 }
