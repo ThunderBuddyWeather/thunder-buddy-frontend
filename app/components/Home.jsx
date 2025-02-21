@@ -6,7 +6,6 @@ import {
   Platform,
   StyleSheet,
 } from 'react-native';
-import { Button } from 'react-native-paper';
 import { useUser } from '../context/UserContext.jsx';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../../constants/COLORS';

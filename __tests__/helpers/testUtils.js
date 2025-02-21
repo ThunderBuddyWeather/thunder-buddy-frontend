@@ -13,7 +13,7 @@ export const renderWithProvider = (component, { username = null } = {}) => {
 export const testPlatformSpecificBehavior = (
   platform,
   config,
-  { mockNavigate, wrapper }
+  { mockNavigate, _wrapper }
 ) => {
   describe(`${platform} specific behavior`, () => {
     it(`renders ${platform} login button correctly`, () => {

@@ -1,4 +1,3 @@
-import { jest } from '@jest/globals';
 
 const paperMock = {
   Button: ({ children, mode, onPress, style, testID, contentStyle }) => {
