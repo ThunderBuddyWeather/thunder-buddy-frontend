@@ -25,7 +25,7 @@ describe('UserContext', () => {
         <TestComponent />
       </UserProvider>
     );
-    
+
     expect(getByTestId('username').props.children).toEqual(['no user']);
   });
 
@@ -35,7 +35,7 @@ describe('UserContext', () => {
         <TestComponent />
       </UserProvider>
     );
-    
+
     expect(getByTestId('username').props.children).toEqual(['initial-user']);
   });
 
@@ -45,15 +45,15 @@ describe('UserContext', () => {
         <TestComponent />
       </UserProvider>
     );
-    
+
     // Verify initial state
     expect(getByTestId('username').props.children).toEqual(['no user']);
-    
+
     // Update username
     act(() => {
       getByTestId('set-user').props.onPress();
     });
-    
+
     // Verify updated state
     expect(getByTestId('username').props.children).toEqual(['test-user']);
   });
@@ -65,10 +65,8 @@ describe('UserContext', () => {
 
     expect(() => {
       render(<TestComponent />);
-    }).toThrow(
-      'useUser must be used within a UserProvider'
-    );
+    }).toThrow('useUser must be used within a UserProvider');
 
     consoleSpy.mockRestore();
   });
-}); 
+});

@@ -1,4 +1,11 @@
-import { jest, describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import {
+  jest,
+  describe,
+  it,
+  expect,
+  beforeEach,
+  afterEach,
+} from '@jest/globals';
 import React from 'react';
 import { COLORS } from '../../constants/COLORS';
 import { styles } from '../../constants/styles';
@@ -35,13 +42,13 @@ const platformConfigs = {
   ios: {
     buttonStyles: {
       login: {
-        className: "bg-blue-600 py-3 px-4 rounded mt-5",
+        className: 'bg-blue-600 py-3 px-4 rounded mt-5',
       },
       logout: {
-        className: "bg-red-600 py-3 px-4 rounded mt-5",
+        className: 'bg-red-600 py-3 px-4 rounded mt-5',
       },
       weather: {
-        className: "bg-blue-600 py-3 px-4 rounded mt-5",
+        className: 'bg-blue-600 py-3 px-4 rounded mt-5',
       },
     },
   },
@@ -65,7 +72,9 @@ function testPlatformSpecificBehavior(platform, config, { mockNavigate }) {
       jest.resetModules();
       jest.clearAllMocks();
       jest.doMock('react-native', () => createMockRN(platform));
-      jest.doMock('react-native-paper', () => require('../mocks/reactNativePaperMocks'));
+      jest.doMock('react-native-paper', () =>
+        require('../mocks/reactNativePaperMocks')
+      );
     });
 
     afterEach(() => {
@@ -80,22 +89,28 @@ function testPlatformSpecificBehavior(platform, config, { mockNavigate }) {
     });
 
     it(`renders ${platform} logout button correctly when logged in`, () => {
-      const { getByTestId } = renderWithProvider(<Home />, { username: 'TestUser' });
+      const { getByTestId } = renderWithProvider(<Home />, {
+        username: 'TestUser',
+      });
       const logoutButton = getByTestId('logout-button');
       expect(logoutButton).toBeTruthy();
       verifyButtonProps(logoutButton, config.buttonStyles.logout, platform);
     });
 
     it(`renders ${platform} weather button correctly when logged in`, () => {
-      const { getByTestId } = renderWithProvider(<Home />, { username: 'TestUser' });
+      const { getByTestId } = renderWithProvider(<Home />, {
+        username: 'TestUser',
+      });
       const weatherButton = getByTestId('weather-button');
       expect(weatherButton).toBeTruthy();
       verifyButtonProps(weatherButton, config.buttonStyles.weather, platform);
     });
 
     it(`handles ${platform} button interactions correctly`, () => {
-      const { getByTestId } = renderWithProvider(<Home />, { username: 'TestUser' });
-      
+      const { getByTestId } = renderWithProvider(<Home />, {
+        username: 'TestUser',
+      });
+
       fireEvent.press(getByTestId('weather-button'));
       expect(mockNavigate).toHaveBeenCalledWith('Weather');
 
@@ -112,7 +127,9 @@ export const setupPlatformTests = ({ mockNavigate }) => {
         jest.resetModules();
         jest.clearAllMocks();
         jest.doMock('react-native', () => createMockRN(platform));
-        jest.doMock('react-native-paper', () => require('../mocks/reactNativePaperMocks'));
+        jest.doMock('react-native-paper', () =>
+          require('../mocks/reactNativePaperMocks')
+        );
       });
 
       afterEach(() => {
@@ -122,4 +139,4 @@ export const setupPlatformTests = ({ mockNavigate }) => {
       testPlatformSpecificBehavior(platform, config, { mockNavigate });
     });
   });
-}; 
+};

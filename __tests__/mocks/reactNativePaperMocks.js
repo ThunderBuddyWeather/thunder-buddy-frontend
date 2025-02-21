@@ -38,4 +38,4 @@ const paperMock = {
   }),
 };
 
-module.exports = paperMock; 
+module.exports = paperMock;

@@ -8,4 +8,4 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
   },
-}); 
+});

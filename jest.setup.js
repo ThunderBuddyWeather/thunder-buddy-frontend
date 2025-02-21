@@ -4,9 +4,11 @@ import '@testing-library/jest-native';
 // Suppress specific console warnings
 const originalWarn = console.warn;
 console.warn = (...args) => {
-  if (args[0]?.includes('new NativeEventEmitter()') || 
-      args[0]?.includes('NativeEventEmitter') || 
-      args[0]?.includes('has been extracted')) {
+  if (
+    args[0]?.includes('new NativeEventEmitter()') ||
+    args[0]?.includes('NativeEventEmitter') ||
+    args[0]?.includes('has been extracted')
+  ) {
     return;
   }
   originalWarn(...args);
@@ -58,22 +60,35 @@ jest.mock('react-native/Libraries/StyleSheet/StyleSheet', () => ({
   flatten: jest.fn(style => style),
   hairlineWidth: 1,
   absoluteFill: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
-  absoluteFillObject: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
+  absoluteFillObject: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
   compose: jest.fn((style1, style2) => ({ ...style1, ...style2 })),
 }));
 
 // Mock ActivityIndicator
-jest.mock('react-native/Libraries/Components/ActivityIndicator/ActivityIndicator', () => 'ActivityIndicator');
+jest.mock(
+  'react-native/Libraries/Components/ActivityIndicator/ActivityIndicator',
+  () => 'ActivityIndicator'
+);
 
 // Mock Pressability
 jest.mock('react-native/Libraries/Pressability/Pressability', () => ({
   default: class Pressability {
     constructor() {}
-    configure() { return {}; }
+    configure() {
+      return {};
+    }
     reset() {}
     destroy() {}
-    static getInstance() { return new Pressability(); }
-  }
+    static getInstance() {
+      return new Pressability();
+    }
+  },
 }));
 
 // Mock PixelRatio
@@ -138,19 +153,21 @@ jest.mock('react-native', () => {
       addEventListener: jest.fn(),
       removeEventListener: jest.fn(),
     },
-    TouchableOpacity: jest.fn(({ style, testID, onPress, children, className, ref, ...props }) => ({
-      $$typeof: Symbol.for('react.element'),
-      type: 'TouchableOpacity',
-      ref: ref || null,
-      props: {
-        style,
-        testID,
-        onPress,
-        className,
-        children: Array.isArray(children) ? children : [children],
-        ...props,
-      },
-    })),
+    TouchableOpacity: jest.fn(
+      ({ style, testID, onPress, children, className, ref, ...props }) => ({
+        $$typeof: Symbol.for('react.element'),
+        type: 'TouchableOpacity',
+        ref: ref || null,
+        props: {
+          style,
+          testID,
+          onPress,
+          className,
+          children: Array.isArray(children) ? children : [children],
+          ...props,
+        },
+      })
+    ),
     Text: jest.fn(({ style, children, className, ref, ...props }) => ({
       $$typeof: Symbol.for('react.element'),
       type: 'Text',
@@ -271,15 +288,15 @@ global.__mockPlatformIOS = mockPlatformIOS;
 
 // Update react-native-paper mock
 jest.mock('react-native-paper', () => ({
-  Button: ({ 
-    testID, 
-    mode, 
-    onPress, 
-    style, 
-    labelStyle, 
+  Button: ({
+    testID,
+    mode,
+    onPress,
+    style,
+    labelStyle,
     contentStyle = {},
     children,
-    ...props 
+    ...props
   }) => ({
     type: 'Button',
     props: {
@@ -290,8 +307,8 @@ jest.mock('react-native-paper', () => ({
       labelStyle,
       contentStyle,
       children,
-      ...props
-    }
+      ...props,
+    },
   }),
   DefaultTheme: {
     colors: {

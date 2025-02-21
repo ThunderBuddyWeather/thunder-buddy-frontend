@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 
-export const createMockRN = (platform) => ({
+export const createMockRN = platform => ({
   Platform: {
     OS: platform,
     select: jest.fn(obj => obj[platform] || obj.default || obj.ios),
@@ -33,7 +33,7 @@ export const createMockRN = (platform) => ({
   StyleSheet: {
     create: styles => styles,
   },
-  NativeEventEmitter: function() {
+  NativeEventEmitter: function () {
     this.addListener = () => {};
     this.removeListeners = () => {};
   },
@@ -42,4 +42,4 @@ export const createMockRN = (platform) => ({
       exportedMethods: [],
     },
   },
-}); 
+});

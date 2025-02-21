@@ -100,7 +100,7 @@ export default function Home() {
         onPress={handleLogOut}
         style={{
           ...styles.button,
-          backgroundColor: COLORS.danger,  // Use theme color
+          backgroundColor: COLORS.danger, // Use theme color
           contentStyle: { minWidth: 100 },
         }}
       >
@@ -127,7 +127,7 @@ export default function Home() {
         onPress={navigateWeather}
         style={{
           ...styles.button,
-          backgroundColor: COLORS.primary,  // Use existing theme color
+          backgroundColor: COLORS.primary, // Use existing theme color
           contentStyle: { minWidth: 100 },
         }}
       >

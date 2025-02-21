@@ -8,6 +8,7 @@ module.exports = {
   testPathIgnorePatterns: ['/node_modules/', '/__tests__/(utils|mocks)/'],
   moduleNameMapper: {
     '^react-native$': '<rootDir>/__tests__/mocks/reactNativeMocks.js',
-    '^react-native-paper$': '<rootDir>/__tests__/mocks/reactNativePaperMocks.js',
+    '^react-native-paper$':
+      '<rootDir>/__tests__/mocks/reactNativePaperMocks.js',
   },
 };

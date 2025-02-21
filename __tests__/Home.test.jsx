@@ -26,7 +26,9 @@ describe('Home Component', () => {
     });
 
     it('renders welcome message with username when logged in', () => {
-      const { getByText } = renderWithProvider(<Home />, { username: 'TestUser' });
+      const { getByText } = renderWithProvider(<Home />, {
+        username: 'TestUser',
+      });
       expect(getByText('Welcome, TestUser!')).toBeTruthy();
     });
   });
