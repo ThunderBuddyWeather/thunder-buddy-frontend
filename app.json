@@ -4,7 +4,7 @@
     "slug": "ThunderBuddyFrontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": null,
+    "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
@@ -18,18 +18,19 @@
     "android": {
       "package": "com.thunderbuddy.frontend",
       "adaptiveIcon": {
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
       }
     },
     "web": {
       "bundler": "metro",
-      "favicon": null
+      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       [
         "expo-splash-screen",
         {
-          "image": null,
+          "image": "./assets/images/splash.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
