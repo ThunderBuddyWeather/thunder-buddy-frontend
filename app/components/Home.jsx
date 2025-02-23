@@ -3,52 +3,20 @@ import { TouchableOpacity, Text, View, Platform, StyleSheet } from 'react-native
 import { Button } from 'react-native-paper';
 import { useUser } from '../context/UserContext.jsx';
 import { useNavigation } from '@react-navigation/native';
+import Weather from './Weather.jsx';
+import LogOut from './LogOut.jsx';
 
 const COLORS = {
   white: '#FFFFFF'
 };
 
-const styles = StyleSheet.create({
-  button: {
-    marginTop: 20,
-    minHeight: 50,
-    paddingHorizontal: 20,
-    paddingVertical: 10
-  },
-  buttonText: {
-    color: COLORS.white,
-    fontSize: 16,
-    textAlign: 'center'
-  },
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24
-  },
-  welcomeText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    margin: 24,
-    marginTop: 0,
-    textAlign: 'center'
-  }
-});
 
 export default function Home() {
-  const { username, setUsername } = useUser();
+  const { user, setUser } = useUser();
   const navigation = useNavigation();
 
   const handleLogIn = () => {
     navigation.navigate('LogIn');
-  };
-
-  const handleLogOut = () => {
-    setUsername(null);
-    navigation.navigate('Home');
-  };
-
-  const navigateWeather = () => {
-    navigation.navigate('Weather');
   };
 
   const LogIn = () => {
@@ -74,60 +42,31 @@ export default function Home() {
     );
   };
 
-  const LogOut = () => {
-    if (Platform.OS === 'ios') {
-      return (
-        <TouchableOpacity
-          onPress={handleLogOut}
-          className="bg-red-600 py-3 px-4 rounded mt-5"
-        >
-          <Text className="text-white text-center text-base">Log Out</Text>
-        </TouchableOpacity>
-      );
-    }
-    return (
-      <Button
-        mode="contained"
-        onPress={handleLogOut}
-        style={styles.button}
-        labelStyle={styles.buttonText}
-      >
-        <Text>Log Out</Text>
-      </Button>
-    );
-  };
-
-  const Weather = () => {
-    if (Platform.OS === 'ios') {
-      return (
-        <TouchableOpacity
-          onPress={navigateWeather}
-          className="bg-blue-600 py-3 px-4 rounded mt-5"
-        >
-          <Text className="text-white text-center text-base">Weather</Text>
-        </TouchableOpacity>
-      );
-    }
-    return (
-      <Button
-        mode="contained"
-        onPress={navigateWeather}
-        style={styles.button}
-        labelStyle={styles.buttonText}
-      >
-        <Text>Weather</Text>
-      </Button>
-    );
-  };
-
   return (
     <View style={styles.container}>
-      <Text style={styles.welcomeText}>
-        {username ? `Welcome, ${username}!` : 'Please log in!'}
+      <Text style={styles.title}>
+        {user ? `Welcome, ${user.name}!` : 'Please log in!'}
         {'\n'}
-        {username ? <LogOut /> : <LogIn />}
-        {username ? <Weather /> : ''}
+        {user ? <Weather /> : ''}
+        {'\n'}
+        {user ? <LogOut /> : <LogIn />}
       </Text>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  title: { fontSize: 24, marginBottom: 20, textAlign: 'center' },
+  button: {
+    marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    minHeight: 50,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+  },
+  buttonText: { fontSize: 16, color: COLORS.white, textAlign: 'center', fontFamily: 'Arial' },
+});
