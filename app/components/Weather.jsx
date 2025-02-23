@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text } from 'react-native';
 import * as Location from 'expo-location';
+import { useUser } from '../context/UserContext.jsx';
 
 export default function Weather() {
   const [currentWeather, setCurrentWeather] = useState(null);
   const [location, setLocation] = useState(null);
+  const { user } = useUser();
 
   const fetchWeather = useCallback(async () => {
     if (!location) {
@@ -37,7 +39,7 @@ export default function Weather() {
         return;
       }
       const currentLocation = await Location.getCurrentPositionAsync({});
-      setLocation(currentLocation);
+      setLocation(currentLocation);                
       console.log('Current Location:', currentLocation);
     };
     getPermissions();
@@ -48,6 +50,12 @@ export default function Weather() {
       fetchWeather();
     }
   }, [location, fetchWeather]);
+
+  if(!user || !location){
+    return (
+      <View><Text>Loading...</Text></View>
+    )
+  }
 
   return (
     <View>

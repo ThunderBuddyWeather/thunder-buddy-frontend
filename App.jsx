@@ -1,22 +1,35 @@
 import React from 'react';
-
-import Home from './app/components/Home.jsx';
-import LogIn from './app/components/LogIn.jsx';
-import Weather from './app/components/Weather.jsx';
-import { UserProvider } from './app/context/UserContext.jsx';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as Linking from 'expo-linking';
+import LogIn from './app/components/LogIn';
+import AuthRedirect from './app/components/AuthRedirect';
+import Home from './app/components/Home';
+import { UserProvider } from './app/context/UserContext';
+import * as WebBrowser from "expo-web-browser";
+WebBrowser.maybeCompleteAuthSession();
+
+const Stack = createNativeStackNavigator();
+
+const linking = {
+  prefixes: [Linking.createURL('/')],
+  config: {
+    screens: {
+      LogIn: 'login',
+      AuthRedirect: 'auth',
+      Home: 'home',
+    },
+  },
+};
 
 export default function App() {
-  const Stack = createNativeStackNavigator();
-
   return (
     <UserProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen name="LogIn" component={LogIn} />
-          <Stack.Screen name="Home" component={Home} />
-          <Stack.Screen name="Weather" component={Weather} />
+      <NavigationContainer linking={linking}>
+        <Stack.Navigator initialRouteName="LogIn">
+          <Stack.Screen name="LogIn" component={LogIn} options={{ headerShown: false }} />
+          <Stack.Screen name="AuthRedirect" component={AuthRedirect} options={{ headerShown: false }} />
+          <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
