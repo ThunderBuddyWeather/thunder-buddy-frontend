@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, Text, Platform } from 'react-native';
+import { View, Text, Platform } from 'react-native';
 import { Button } from 'react-native-paper';
 import * as AuthSession from 'expo-auth-session';
 import { authDomain, clientId } from '../../auth0-config';
-import { COLORS } from '../../constants/COLORS';
+import styles from '../stylesheets/styles.js';
 
 const redirectUri =
   Platform.OS === 'web'
@@ -13,7 +13,7 @@ const redirectUri =
 console.log('redirect uri:', redirectUri)
 export default function LogIn() {
 
-  const [request, response, promptAsync] = AuthSession.useAuthRequest(
+  const [request, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId,
       scopes: ['openid', 'profile', 'email'],
@@ -55,24 +55,8 @@ export default function LogIn() {
         style={styles.button}
         labelStyle={styles.buttonText}
       >
-        Login
+        <Text>Login</Text>
       </Button>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  title: { fontSize: 24, marginBottom: 20, textAlign: 'center' },
-  button: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    minHeight: 50,
-    backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 5,
-  },
-  buttonText: { fontSize: 16, color: COLORS.white, textAlign: 'center', fontFamily: 'Arial' },
-});

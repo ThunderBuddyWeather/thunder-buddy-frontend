@@ -1,7 +1,9 @@
 import React from 'react';
 import { Button } from 'react-native-paper';
+import { Text} from 'react-native';
 import { useUser } from '../context/UserContext';
 import { authDomain, clientId } from '../../auth0-config';
+import styles from '../stylesheets/styles.js';
 
 export default function LogoutButton() {
   const { setUser } = useUser();
@@ -15,8 +17,13 @@ export default function LogoutButton() {
   };
 
   return (
-    <Button mode="contained" onPress={handleLogout}>
-      Log Out
+    <Button 
+        mode="contained" 
+        onPress={handleLogout}
+        style={styles.button}
+        labelStyle={styles.buttonText}
+        >
+      <Text>Log Out</Text>
     </Button>
   );
 }

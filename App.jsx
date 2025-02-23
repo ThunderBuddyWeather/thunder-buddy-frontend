@@ -1,7 +1,3 @@
-// App.js
-import * as WebBrowser from "expo-web-browser";
-WebBrowser.maybeCompleteAuthSession();
-
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -10,6 +6,8 @@ import LogIn from './app/components/LogIn';
 import AuthRedirect from './app/components/AuthRedirect';
 import Home from './app/components/Home';
 import { UserProvider } from './app/context/UserContext';
+import * as WebBrowser from "expo-web-browser";
+WebBrowser.maybeCompleteAuthSession();
 
 const Stack = createNativeStackNavigator();
 

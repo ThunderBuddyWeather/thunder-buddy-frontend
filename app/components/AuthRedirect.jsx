@@ -1,5 +1,4 @@
-// app/components/AuthRedirect.js
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import jwt_decode from 'jwt-decode';
 import { useUser } from '../context/UserContext';

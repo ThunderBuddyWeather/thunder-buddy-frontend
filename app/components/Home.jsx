@@ -1,18 +1,14 @@
 import React from 'react';
-import { TouchableOpacity, Text, View, Platform, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, View, Platform} from 'react-native';
 import { Button } from 'react-native-paper';
 import { useUser } from '../context/UserContext.jsx';
 import { useNavigation } from '@react-navigation/native';
 import Weather from './Weather.jsx';
 import LogOut from './LogOut.jsx';
-
-const COLORS = {
-  white: '#FFFFFF'
-};
-
+import styles from '../stylesheets/styles.js';
 
 export default function Home() {
-  const { user, setUser } = useUser();
+  const { user} = useUser();
   const navigation = useNavigation();
 
   const handleLogIn = () => {
@@ -54,19 +50,3 @@ export default function Home() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  title: { fontSize: 24, marginBottom: 20, textAlign: 'center' },
-  button: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    minHeight: 50,
-    backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 5,
-  },
-  buttonText: { fontSize: 16, color: COLORS.white, textAlign: 'center', fontFamily: 'Arial' },
-});
