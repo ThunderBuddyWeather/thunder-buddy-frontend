@@ -2,24 +2,36 @@ import React from 'react';
 import { View, Text, Platform } from 'react-native';
 import { Button } from 'react-native-paper';
 import * as AuthSession from 'expo-auth-session';
+import * as WebBrowser from 'expo-web-browser';
+import { useNavigation } from '@react-navigation/native';
 import { authDomain, clientId } from '../../auth0-config';
 import styles from '../stylesheets/styles.js';
 
-const redirectUri =
-  Platform.OS === 'web'
-    ? `${window.location.origin}/auth`
-    : AuthSession.makeRedirectUri({ native: 'exp://192.168.1.59:8081' });
+WebBrowser.maybeCompleteAuthSession();
 
-console.log('redirect uri:', redirectUri)
 export default function LogIn() {
+  const navigation = useNavigation();
 
-  const [request, promptAsync] = AuthSession.useAuthRequest(
+  const getRedirectUri = () => {
+    return AuthSession.makeRedirectUri({
+      scheme: 'myapp',
+      path: 'auth',
+      useProxy: Platform.OS !== 'web',
+    });
+  };
+
+  const redirectUri = getRedirectUri();
+  console.log("Configured redirect URI:", redirectUri);
+
+  const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId,
       scopes: ['openid', 'profile', 'email'],
       redirectUri,
-      responseType: AuthSession.ResponseType.IdToken,
-      extraParams: { nonce: 'nonce' },
+      responseType: AuthSession.ResponseType.Code,
+      extraParams: {
+        audience: `https://${authDomain}/api/v2/`
+      },
     },
     {
       authorizationEndpoint: `https://${authDomain}/authorize`,
@@ -27,21 +39,41 @@ export default function LogIn() {
     }
   );
 
-  const handleLogin = () => {
+  React.useEffect(() => {
+    const handleAuthResponse = async () => {
+      if (response?.type === 'success' && response.params.code) {
+        console.log("Mobile login success, code:", response.params.code);
+        navigation.navigate('AuthRedirect', {
+          code: response.params.code,
+          codeVerifier: request.codeVerifier, // Pass the code verifier
+        });
+      } else if (response?.type === 'error') {
+        console.error("Mobile auth error:", response.error);
+      } else if (response?.type) {
+        console.log("Auth response:", response);
+      }
+    };
+
+    handleAuthResponse();
+  }, [response, navigation, request]);
+
+  const handleLogin = async () => {
     console.log("Initiating auth session...");
+
     if (Platform.OS === 'web') {
       const params = new URLSearchParams({
         client_id: clientId,
         scope: 'openid profile email',
-        response_type: 'id_token',
+        response_type: 'code',
         redirect_uri: redirectUri,
-        nonce: 'nonce',
+        audience: `https://${authDomain}/api/v2/`
       });
       const authUrl = `https://${authDomain}/authorize?${params.toString()}`;
-      console.log("Auth URL:", authUrl);
+      console.log("Web auth URL:", authUrl);
       window.location.href = authUrl;
     } else {
-      promptAsync();
+      console.log("Starting mobile auth flow with useAuthRequest");
+      await promptAsync();
     }
   };
 

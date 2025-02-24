@@ -1,29 +1,61 @@
 import React from 'react';
 import { Button } from 'react-native-paper';
-import { Text} from 'react-native';
+import { Text, View, Platform, TouchableOpacity } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
 import { useUser } from '../context/UserContext';
 import { authDomain, clientId } from '../../auth0-config';
 import styles from '../stylesheets/styles.js';
 
-export default function LogoutButton() {
+export default function LogOut() {
   const { setUser } = useUser();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setUser(null);
 
-    const returnTo = encodeURIComponent('http://localhost:8081'); 
+    const returnTo = Platform.OS === 'web'
+      ? encodeURIComponent(window.location.origin)
+      : encodeURIComponent('myapp://'); // For Expo Go
+
     const logoutUrl = `https://${authDomain}/v2/logout?client_id=${clientId}&returnTo=${returnTo}`;
-    window.location.href = logoutUrl;
+
+    try {
+      if (Platform.OS === 'web') {
+        console.log("Logging out on web:", logoutUrl);
+        window.location.href = logoutUrl;
+      } else {
+        console.log("Logging out on Expo:", logoutUrl);
+        const result = await WebBrowser.openAuthSessionAsync(logoutUrl, returnTo);
+        console.log("Logout result on Expo:", result);
+
+        if (result.type === 'success') {
+          console.log("Logged out successfully on Expo");
+        } else if (result.type === 'cancel') {
+          console.warn("Logout was canceled on Expo");
+        } else {
+          console.warn("Logout flow failed or was closed", result);
+        }
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   return (
-    <Button 
-        mode="contained" 
-        onPress={handleLogout}
-        style={styles.button}
-        labelStyle={styles.buttonText}
+    <View style={[styles.container]}>
+      {Platform.OS === 'ios' ? (
+        <TouchableOpacity onPress={handleLogout} activeOpacity={0.7} style={styles.button}>
+          <Text style={styles.buttonText}>Log Out</Text>
+        </TouchableOpacity>
+      ) : (
+        <Button
+          mode="contained"
+          onPress={handleLogout}
+          style={styles.button}
+          labelStyle={styles.buttonText}
         >
-      <Text>Log Out</Text>
-    </Button>
+          Log Out
+        </Button>
+      )}
+    </View>
   );
 }
