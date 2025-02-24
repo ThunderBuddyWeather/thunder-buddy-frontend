@@ -45,7 +45,7 @@ export default function LogIn() {
         console.log("Mobile login success, code:", response.params.code);
         navigation.navigate('AuthRedirect', {
           code: response.params.code,
-          codeVerifier: request.codeVerifier, // Pass the code verifier
+          codeVerifier: request.codeVerifier,
         });
       } else if (response?.type === 'error') {
         console.error("Mobile auth error:", response.error);

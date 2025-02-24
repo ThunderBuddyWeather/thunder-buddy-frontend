@@ -14,7 +14,7 @@ export default function LogOut() {
 
     const returnTo = Platform.OS === 'web'
       ? encodeURIComponent(window.location.origin)
-      : encodeURIComponent('myapp://'); // For Expo Go
+      : encodeURIComponent('myapp://'); 
 
     const logoutUrl = `https://${authDomain}/v2/logout?client_id=${clientId}&returnTo=${returnTo}`;
 
@@ -53,7 +53,7 @@ export default function LogOut() {
           style={styles.button}
           labelStyle={styles.buttonText}
         >
-          Log Out
+          <Text>Log Out</Text>
         </Button>
       )}
     </View>

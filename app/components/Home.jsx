@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, View, Platform } from 'react-native';
+import { Text, View} from 'react-native';
 import { Button } from 'react-native-paper';
 import { useUser } from '../context/UserContext.jsx';
 import { useNavigation } from '@react-navigation/native';
