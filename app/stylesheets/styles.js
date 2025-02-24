@@ -6,11 +6,13 @@ const Styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: COLORS.primary,
         borderRadius: 5,
+        elevation: 0, 
         justifyContent: 'center',
         marginTop: 20,
         minHeight: 50,
         paddingHorizontal: 20,
         paddingVertical: 10,
+        zIndex: 1, 
     },
     buttonText: {
         color: COLORS.white,
@@ -20,8 +22,9 @@ const Styles = StyleSheet.create({
     },
     container: {
         alignItems: 'center',
-        flex: 1,
         justifyContent: 'center',
+        marginBottom: 'auto',
+        marginTop: 'auto',
         padding: 20,
     },
     title: {
