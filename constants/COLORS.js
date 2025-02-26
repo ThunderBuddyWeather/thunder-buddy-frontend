@@ -1,4 +1,14 @@
 export const COLORS = {
-  white: '#ffffff',
-  primary: '#6200ee'
+  PRIMARY: '#007AFF',
+  SECONDARY: '#5856D6',
+  SUCCESS: '#4CD964',
+  WARNING: '#FF9500',
+  DANGER: '#FF3B30',
+  DISABLED: '#CCCCCC',
+  WHITE: 'white',
+  BLACK: 'black',
+  GRAY: '#8E8E93',
+  LIGHT_GRAY: '#E5E5EA',
+  BACKGROUND: '#F2F2F7',
+  TEXT: '#1C1C1E',
 }; 

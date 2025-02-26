@@ -1,94 +1,117 @@
-import React from 'react';
-import { View, Text, Platform } from 'react-native';
-import { Button } from 'react-native-paper';
-import * as AuthSession from 'expo-auth-session';
-import * as WebBrowser from 'expo-web-browser';
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { authDomain, clientId } from '../../auth0-config';
-import styles from '../stylesheets/styles.js';
+import * as WebBrowser from 'expo-web-browser';
+import * as AuthSession from 'expo-auth-session';
+import authConfig from '../../auth0-config';
+import { COLORS } from '../../constants/COLORS';
 
+// Ensure auth session is completed when the app returns from the browser
 WebBrowser.maybeCompleteAuthSession();
 
 export default function LogIn() {
   const navigation = useNavigation();
 
-  const getRedirectUri = () => {
-    return AuthSession.makeRedirectUri({
-      scheme: 'myapp',
-      path: 'auth',
-      useProxy: Platform.OS !== 'web',
-    });
-  };
-
-  const redirectUri = getRedirectUri();
-  console.log("Configured redirect URI:", redirectUri);
-
+  // Configure Auth0 request
+  const redirectUri = AuthSession.makeRedirectUri({ useProxy: false });
+  
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
-      clientId,
+      clientId: authConfig.clientId,
       scopes: ['openid', 'profile', 'email'],
       redirectUri,
       responseType: AuthSession.ResponseType.Code,
       extraParams: {
-        audience: `https://${authDomain}/api/v2/`
-      },
+        audience: `https://${authConfig.authDomain}/api/v2/`
+      }
     },
     {
-      authorizationEndpoint: `https://${authDomain}/authorize`,
-      tokenEndpoint: `https://${authDomain}/oauth/token`,
+      authorizationEndpoint: `https://${authConfig.authDomain}/authorize`,
+      tokenEndpoint: `https://${authConfig.authDomain}/oauth/token`
     }
   );
 
-  React.useEffect(() => {
-    const handleAuthResponse = async () => {
-      if (response?.type === 'success' && response.params.code) {
-        console.log("Mobile login success, code:", response.params.code);
-        navigation.navigate('AuthRedirect', {
-          code: response.params.code,
-          codeVerifier: request.codeVerifier,
-        });
-      } else if (response?.type === 'error') {
-        console.error("Mobile auth error:", response.error);
-      } else if (response?.type) {
-        console.log("Auth response:", response);
-      }
-    };
-
-    handleAuthResponse();
+  // Handle auth response
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { code } = response.params;
+      
+      // Navigate to auth redirect screen with auth code and verifier
+      navigation.navigate('AuthRedirect', {
+        code,
+        codeVerifier: request.codeVerifier
+      });
+    } else if (response?.type === 'error') {
+      console.error('Mobile auth error:', response.error);
+    }
   }, [response, navigation, request]);
 
+  // Handle login button press
   const handleLogin = async () => {
-    console.log("Initiating auth session...");
-
     if (Platform.OS === 'web') {
-      const params = new URLSearchParams({
-        client_id: clientId,
-        scope: 'openid profile email',
-        response_type: 'code',
-        redirect_uri: redirectUri,
-        audience: `https://${authDomain}/api/v2/`
-      });
-      const authUrl = `https://${authDomain}/authorize?${params.toString()}`;
-      console.log("Web auth URL:", authUrl);
-      window.location.href = authUrl;
+      // For web, redirect directly to Auth0
+      const authUrl = new URL(`https://${authConfig.authDomain}/authorize`);
+      
+      // Add required parameters
+      authUrl.searchParams.append('client_id', authConfig.clientId);
+      authUrl.searchParams.append('redirect_uri', redirectUri);
+      authUrl.searchParams.append('response_type', 'code');
+      authUrl.searchParams.append('scope', 'openid profile email');
+      authUrl.searchParams.append('audience', `https://${authConfig.authDomain}/api/v2/`);
+      
+      // Redirect to Auth0
+      window.location.href = authUrl.toString();
     } else {
-      console.log("Starting mobile auth flow with useAuthRequest");
+      // For native platforms, use Expo's AuthSession
       await promptAsync();
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <Button
-        mode="contained"
+      <Text style={styles.title}>Welcome to Thunder Buddy</Text>
+      <Text style={styles.subtitle}>Your personal weather assistant</Text>
+      
+      <TouchableOpacity
+        style={[styles.button, !request && styles.buttonDisabled]}
         onPress={handleLogin}
         disabled={!request}
-        style={styles.button}
-        labelStyle={styles.buttonText}
       >
-        <Text>Login</Text>
-      </Button>
+        <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  button: {
+    backgroundColor: COLORS.PRIMARY,
+    borderRadius: 5,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  buttonDisabled: {
+    backgroundColor: COLORS.DISABLED,
+  },
+  buttonText: {
+    color: COLORS.WHITE,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  container: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+});
