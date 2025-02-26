@@ -27,7 +27,7 @@ export default function Home() {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="home-container">
       <View style={styles.textContainer}>
         <Text style={styles.title}>
           {user ? `Welcome, ${user.name}!` : 'Please log in!'}
