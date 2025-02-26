@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Platform } from 'react-native';
+import { Text, Platform, SafeAreaView } from 'react-native';
 import { Button } from 'react-native-paper';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
@@ -78,7 +78,7 @@ export default function LogIn() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Login</Text>
       <Button
         mode="contained"
@@ -89,6 +89,6 @@ export default function LogIn() {
       >
         <Text>Login</Text>
       </Button>
-    </View>
+    </SafeAreaView>
   );
 }

@@ -21,11 +21,12 @@ const Styles = StyleSheet.create({
         textAlign: 'center',
     },
     container: {
+        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 'auto',
-        marginTop: 'auto',
         padding: 20,
+        maxWidth: '90%',
+        minWidth: '90%'
     },
     title: {
         fontSize: 24,
