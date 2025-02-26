@@ -1,13 +1,13 @@
 import { describe, it, expect } from '@jest/globals';
 import React from 'react';
-import { render, screen } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import Index from '../index';
 
 describe('Index Component', () => {
   it('renders correctly', () => {
-    render(<Index />);
-
-    const textElement = screen.getByText(
+    const { getByText } = render(<Index />);
+    
+    const textElement = getByText(
       'Edit app/index.tsx to edit this screen.'
     );
     expect(textElement).toBeTruthy();
