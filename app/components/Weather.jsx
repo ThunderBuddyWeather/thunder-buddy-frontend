@@ -53,12 +53,12 @@ export default function Weather() {
 
   if(!user || !location){
     return (
-      <View><Text>Loading...</Text></View>
+      <View testID="weather-loading"><Text>Loading...</Text></View>
     )
   }
 
   return (
-    <View>
+    <View testID="weather-container">
       <Text>
         {location
           ? `Location: ${location.coords.latitude} / ${location.coords.longitude}`
