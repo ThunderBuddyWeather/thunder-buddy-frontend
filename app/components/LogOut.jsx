@@ -2,12 +2,12 @@ import React from 'react';
 import { Button } from 'react-native-paper';
 import { Text, View, Platform, TouchableOpacity } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
-import { useUser } from '../context/UserContext';
+import { useAppContext } from '../context/AppContext.jsx';
 import { authDomain, clientId } from '../../auth0-config';
 import styles from '../stylesheets/styles.js';
 
 export default function LogOut() {
-  const { setUser } = useUser();
+  const { setUser } = useAppContext();
 
   const handleLogout = async () => {
     setUser(null);

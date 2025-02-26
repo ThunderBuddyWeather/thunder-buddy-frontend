@@ -22,9 +22,10 @@ const Styles = StyleSheet.create({
     },
     container: {
         alignItems: 'center',
+        flex: 1,
         justifyContent: 'center',
-        marginBottom: 'auto',
-        marginTop: 'auto',
+        maxWidth: '90%',
+        minWidth: '90%',
         padding: 20,
     },
     title: {
