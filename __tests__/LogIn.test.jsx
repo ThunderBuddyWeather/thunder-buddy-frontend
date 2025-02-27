@@ -1,4 +1,4 @@
-/* global jest */
+import { jest, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from '@jest/globals';
 import { fn } from 'jest-mock';
 import React from 'react';
 
@@ -41,7 +41,6 @@ jest.mock('../auth0-config', () => ({
   authDomain: 'test.auth0.com'
 }));
 
-import { jest, describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { render, fireEvent, act } from '@testing-library/react-native';
 import LogIn from '../app/components/LogIn';
 

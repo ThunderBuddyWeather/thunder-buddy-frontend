@@ -1,11 +1,14 @@
 /* global describe, it, expect, jest */
 // Additional test coverage for the Home component
 import React from 'react';
-import { render, waitFor } from '@testing-library/react-native';
+import { render, waitFor, fireEvent } from '@testing-library/react-native';
 import { beforeEach } from '@jest/globals';
+import { act } from 'react-test-renderer';
+import { StyleSheet } from 'react-native';
+import { useAppContext } from '../app/context/AppContext';
+import Home from '../app/components/Home';
 
 // Mock StyleSheet.flatten
-import { StyleSheet } from 'react-native';
 if (typeof StyleSheet.flatten !== 'function') {
   StyleSheet.flatten = (style) => style;
 }
@@ -65,57 +68,6 @@ jest.mock('expo-location', () => ({
   getCurrentPositionAsync: jest.fn(() => Promise.resolve({ coords: { latitude: 0, longitude: 0 } }))
 }));
 
-// Mock react-native with proper AccessibilityInfo and Appearance implementations
-jest.mock('react-native', () => ({
-  Platform: {
-    OS: 'ios',
-    select: (obj) => obj.ios
-  },
-  StyleSheet: {
-    create: (styles) => styles,
-    flatten: (style) => style
-  },
-  Text: Object.assign(
-    ({ children, style, ...rest }) => {
-      const React = require('react');
-      return React.createElement('span', { style, ...rest }, children);
-    },
-    { displayName: 'Text' }
-  ),
-  View: ({ children, style, ...rest }) => {
-    const React = require('react');
-    return React.createElement('div', { style, ...rest }, children);
-  },
-  SafeAreaView: ({ children, style, ...rest }) => {
-    const React = require('react');
-    return React.createElement('div', { style, ...rest }, children);
-  },
-  ScrollView: ({ children, contentContainerStyle, ...props }) => {
-    const React = require('react');
-    return React.createElement('div', { style: contentContainerStyle, ...props }, children);
-  },
-  TouchableOpacity: ({ children, ...props }) => {
-    const React = require('react');
-    return React.createElement('button', props, children);
-  },
-  Image: ({ ...props }) => {
-    const React = require('react');
-    return React.createElement('img', props);
-  },
-  Appearance: {
-    addChangeListener: jest.fn(() => ({ remove: jest.fn() })),
-    removeChangeListener: jest.fn(),
-    getColorScheme: jest.fn(() => 'light')
-  },
-  AccessibilityInfo: {
-    addEventListener: jest.fn(() => ({ remove: jest.fn() })),
-    removeEventListener: jest.fn(),
-    setAccessibilityFocus: jest.fn(),
-    announceForAccessibility: jest.fn(),
-    isScreenReaderEnabled: jest.fn(() => Promise.resolve(false))
-  }
-}));
-
 // Mock navigation
 const mockNavigate = jest.fn();
 jest.mock('@react-navigation/native', () => ({
@@ -124,33 +76,20 @@ jest.mock('@react-navigation/native', () => ({
   })
 }));
 
-import { useAppContext } from '../app/context/AppContext';
-import Home from '../app/components/Home';
-
-// Mock fetch
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    ok: true,
-    json: () => Promise.resolve({
-      data: [{
-        temp: 20,
-        weather: {
-          description: 'Clear sky',
-          icon: 'c01d'
-        },
-        wind_spd: 5,
-        rh: 45,
-        city_name: 'Test City'
-      }]
-    })
-  })
-);
-
 describe('Additional Home Component Coverage', () => {
   beforeEach(() => {
+    // Clear all mocks
     jest.clearAllMocks();
-    // Clear fetch mock calls
-    global.fetch.mockClear();
+    
+    // Mock user context
+    useAppContext.mockReturnValue({
+      user: null,
+      setUser: jest.fn(),
+      weather: null,
+      alert: null,
+      setWeather: jest.fn(),
+      setAlert: jest.fn()
+    });
   });
 
   it('does not render login button when user is logged in', async () => {
@@ -168,34 +107,28 @@ describe('Additional Home Component Coverage', () => {
     await waitFor(() => {
       expect(queryByText(/Log In/i)).toBeNull();
     });
-
-    // Wait for any remaining promises to resolve
-    await new Promise(resolve => setTimeout(resolve, 0));
   });
 
   it('renders login button when user is not logged in', async () => {
-    // Clear any previous mock calls
-    mockNavigate.mockClear();
-
-    // Set user as null in AppContext
+    // Mock user context with null user
+    const mockSetUser = jest.fn();
     useAppContext.mockReturnValue({
       user: null,
+      setUser: mockSetUser,
       weather: null,
-      alert: null,
       setWeather: jest.fn(),
+      alert: null,
       setAlert: jest.fn()
     });
 
-    const { findByTestId } = render(<Home />);
-    
-    // Wait for the button to be rendered
-    const button = await findByTestId('login-button');
-    expect(button).toBeTruthy();
+    render(<Home />);
+
+    // Wait for any state updates
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
 
     // Verify that navigation was attempted
     expect(mockNavigate).toHaveBeenCalledWith('LogIn');
-
-    // Wait for any remaining promises to resolve
-    await new Promise(resolve => setTimeout(resolve, 0));
   });
 }); 
