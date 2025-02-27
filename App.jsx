@@ -4,38 +4,56 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Linking from 'expo-linking';
 import LogIn from './app/components/LogIn';
-import Home from './app/components/Home';
-import AuthRedirect from './app/components/AuthRedirect'; 
-import { AppProvider } from './app/context/AppContext.jsx';
+import AuthRedirect from './app/components/AuthRedirect';
+import { AppProvider, useAppContext } from './app/context/AppContext.jsx';
+import MainTabs from './app/components/MainTabs';
 
 const Stack = createNativeStackNavigator();
 
 const linking = {
   prefixes: [
-    'http://localhost:8081',  
-    'exp://192.168.1.59:8081', 
-    'myapp://',  
-    Linking.createURL('/') 
+    'http://localhost:8081',
+    'exp://192.168.1.59:8081',
+    'myapp://',
+    Linking.createURL('/')
   ],
   config: {
     screens: {
       LogIn: 'login',
-      Home: 'home',
-      AuthRedirect: 'auth' 
+      AuthRedirect: 'auth',
+      Main: {
+        screens: {
+          Home: 'home',
+          Social: 'social',
+        },
+      },
     },
   },
 };
+
+// A wrapper to choose between auth and main flows
+function RootNavigator() {
+  const { user } = useAppContext();
+  return (
+    <Stack.Navigator initialRouteName="LogIn" screenOptions={{ headerShown: false }}>
+      {!user ? (
+        <>
+          <Stack.Screen name="LogIn" component={LogIn} />
+          <Stack.Screen name="AuthRedirect" component={AuthRedirect} />
+        </>
+      ) : (
+        <Stack.Screen name="Main" component={MainTabs} />
+      )}
+    </Stack.Navigator>
+  );
+}
 
 export default function App() {
   return (
     <PaperProvider>
       <AppProvider>
         <NavigationContainer linking={linking}>
-          <Stack.Navigator initialRouteName="LogIn">
-            <Stack.Screen name="LogIn" component={LogIn} options={{ headerShown: false }} />
-            <Stack.Screen name="AuthRedirect" component={AuthRedirect} options={{ headerShown: false }} />
-            <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
-          </Stack.Navigator>
+          <RootNavigator />
         </NavigationContainer>
       </AppProvider>
     </PaperProvider>
