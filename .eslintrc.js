@@ -25,7 +25,10 @@ module.exports = {
     'react/prop-types': 'off', // Disable prop-types requirement (if you're using TypeScript or prefer other validation)
     'react-native/no-inline-styles': 'off', // Disable inline styles warning
     'react-native/no-color-literals': 'off', // Disable color literals warning
+    'react-native/sort-styles': 'off', // Disable style property sorting
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }], // Warn on unused variables, allow unused function args that start with _
+    'import/order': 'off', // Disable import order checking
+    'sort-imports': 'off', // Disable sorting of import statements
   },
   settings: {
     react: {

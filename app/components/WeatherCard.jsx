@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     maxWidth: '90%',
     minWidth: '90%',
-    padding: 16,
+    padding: 16,  
     shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 4
@@ -98,26 +98,26 @@ const styles = StyleSheet.create({
   condition: {
     fontSize: 20,
     fontWeight: '600',
-    marginTop: 8
+    marginTop: 8,
   },
   icon: {
     height: '100%',
     resizeMode: 'contain',
-    width: '100%'
+    width: '100%',
   },
   iconContainer: {
     height: 100,
     position: 'relative',
-    width: 100
+    width: 100,
   },
   info: {
     fontSize: 16,
-    marginTop: 4
+    marginTop: 4,
   },
   loadingContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16
+    padding: 16,
   },
   tempOverlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
@@ -128,6 +128,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     paddingVertical: 2,
     position: 'absolute',
-    right: -5
-  }
+    right: -5,
+  },
 });
