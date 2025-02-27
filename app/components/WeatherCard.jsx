@@ -7,27 +7,27 @@ export default function WeatherCard() {
   const { weather, setWeather } = useAppContext();
   const [loading, setLoading] = useState(true);
 
-  const fetchWeather = async (latitude, longitude) => {
-    const API_KEY = 'bc03c97ff0b740569b8d21b93f241fa6';
-    try {
-      const response = await fetch(
-        `https://api.weatherbit.io/v2.0/current?lat=${latitude}&lon=${longitude}&key=${API_KEY}&include=minutely`
-      );
-      const data = await response.json();
-      if (response.ok) {
-        setWeather(data.data[0]);
-        console.log('Fetched weather:', data.data[0]);
-      } else {
-        console.log('Failed to fetch weather');
-      }
-    } catch (err) {
-      console.log('Something went wrong. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchWeather = async (latitude, longitude) => {
+      const API_KEY = 'bc03c97ff0b740569b8d21b93f241fa6';
+      try {
+        const response = await fetch(
+          `https://api.weatherbit.io/v2.0/current?lat=${latitude}&lon=${longitude}&key=${API_KEY}&include=minutely`
+        );
+        const data = await response.json();
+        if (response.ok) {
+          setWeather(data.data[0]);
+          console.log('Fetched weather:', data.data[0]);
+        } else {
+          console.log('Failed to fetch weather');
+        }
+      } catch (err) {
+        console.log('Something went wrong. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     const getLocationAndWeather = async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -37,10 +37,11 @@ export default function WeatherCard() {
       }
       const currentLocation = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = currentLocation.coords;
-      fetchWeather(latitude, longitude);
+      await fetchWeather(latitude, longitude);
     };
+
     getLocationAndWeather();
-  }, []);
+  }, [setWeather]);
 
   if (loading) {
     return (

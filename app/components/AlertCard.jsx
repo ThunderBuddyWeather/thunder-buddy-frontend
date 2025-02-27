@@ -67,7 +67,7 @@ export default function AlertCard() {
       }
     };
     fetchAlerts();
-  }, [weather, setAlert]);
+  }, [weather, setAlert, alert]);
 
   const openLink = (uri) => {
     if (uri) {
@@ -144,7 +144,7 @@ export default function AlertCard() {
           </ScrollView>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 }}>
             <Button mode="contained" onPress={closeModal}>
-              Close
+              <Text>Close</Text>
             </Button>
             {alert?.uri && (
               <Button
