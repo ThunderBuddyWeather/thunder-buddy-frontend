@@ -1,216 +1,215 @@
-import { jest, describe, it, expect, beforeEach } from '@jest/globals';
+// Mock auth config first to avoid import issues
+jest.mock('../../auth0-config', () => ({
+  clientId: 'test-client-id',
+  authDomain: 'test.auth0.com'
+}));
+
+import { jest, describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import React from 'react';
 import { render, fireEvent, act } from '@testing-library/react-native';
 import LogIn from '../app/components/LogIn';
-import * as AuthSession from 'expo-auth-session';
 
-// Mock react-native Platform
-jest.mock('react-native', () => {
-  const RN = {
-    Platform: {
-      OS: 'ios',
-      select: jest.fn(obj => obj.ios || obj.default)
-    },
-    StyleSheet: {
-      create: jest.fn(styles => styles),
-      flatten: jest.fn(style => style)
-    },
-    View: 'View',
-    Text: 'Text',
-    TouchableOpacity: 'TouchableOpacity',
-    Pressable: 'Pressable'
-  };
-  
-  // Add getter/setter for Platform.OS to allow mocking
-  Object.defineProperty(RN.Platform, 'OS', {
-    get: jest.fn(() => 'ios'),
-    set: jest.fn()
-  });
-  
-  return RN;
-});
-
-jest.mock('expo-auth-session', () => ({
-  makeRedirectUri: jest.fn(() => 'mock-redirect-uri'),
-  useAuthRequest: jest.fn(),
-  ResponseType: {
-    Code: 'code'
-  }
+// Mock navigation
+const mockNavigate = jest.fn();
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({ navigate: mockNavigate })
 }));
 
+// Mock expo-web-browser
 jest.mock('expo-web-browser', () => ({
   maybeCompleteAuthSession: jest.fn()
 }));
 
-jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({
-    navigate: jest.fn()
-  })
+// Mock expo-auth-session
+const mockPromptAsync = jest.fn();
+const mockRequest = {
+  type: 'success',
+  codeVerifier: 'test-verifier'
+};
+jest.mock('expo-auth-session', () => ({
+  makeRedirectUri: jest.fn(() => 'https://test.redirect.uri'),
+  useAuthRequest: jest.fn(() => [mockRequest, null, mockPromptAsync]),
+  ResponseType: { Code: 'code' }
 }));
 
-jest.mock('../auth0-config', () => ({
-  authDomain: 'test.auth0.com',
-  clientId: 'test-client-id'
+// Mock react-native
+jest.mock('react-native', () => ({
+  Platform: {
+    OS: 'ios',
+    select: jest.fn(obj => obj.ios)
+  },
+  StyleSheet: {
+    create: jest.fn(styles => styles)
+  },
+  Text: ({ children, style, ...rest }) => <span style={style} {...rest}>{children}</span>,
+  View: ({ children, style, ...rest }) => <div style={style} {...rest}>{children}</div>,
+  SafeAreaView: ({ children, style, ...rest }) => <div style={style} {...rest}>{children}</div>,
+  TouchableOpacity: (props) => {
+    const { testID, ...otherProps } = props;
+    return <button data-testid={testID} {...otherProps}>{props.children}</button>;
+  }
+}));
+
+// Mock react-native-paper
+jest.mock('react-native-paper', () => ({
+  Button: (props) => {
+    const { onPress, disabled, children, ...rest } = props;
+    return (
+      <button onClick={onPress} disabled={disabled} data-testid="login-button" {...rest}>
+        {children}
+      </button>
+    );
+  }
+}));
+
+// Mock COLORS
+jest.mock('../constants/COLORS', () => ({
+  COLORS: {
+    PRIMARY: '#007AFF',
+    DISABLED: '#CCCCCC',
+    WHITE: '#FFFFFF'
+  }
+}));
+
+// Mock AppContext
+jest.mock('../app/context/AppContext', () => ({
+  useAppContext: jest.fn(() => ({}))
 }));
 
 describe('LogIn Component', () => {
-  const mockPromptAsync = jest.fn();
-  
   beforeEach(() => {
     jest.clearAllMocks();
-    // Setup default mock implementation for useAuthRequest
-    AuthSession.useAuthRequest.mockImplementation(() => [
-      { codeVerifier: 'test-verifier' },
-      null,
-      mockPromptAsync
-    ]);
+    // Reset Platform.OS to ios by default
+    require('react-native').Platform.OS = 'ios';
+  });
+
+  it('renders correctly with all required elements', () => {
+    const { getByTestId, toJSON } = render(<LogIn />);
+    const button = getByTestId('login-button');
+    expect(button).toBeTruthy();
+    const tree = toJSON();
+    expect(JSON.stringify(tree)).toMatch(/Login/);
+  });
+
+  it('disables login button when auth request is not ready', () => {
+    // Mock request as null to simulate not ready state
+    require('expo-auth-session').useAuthRequest.mockReturnValueOnce([null, null, mockPromptAsync]);
     
-    // Reset Platform.OS to ios for each test
-    jest.spyOn(require('react-native').Platform, 'OS', 'get')
-      .mockReturnValue('ios');
-  });
-
-  it('renders login button correctly', () => {
-    const { getAllByText } = render(<LogIn />);
-    const loginButtons = getAllByText(/login/i);
-    expect(loginButtons.length).toBeGreaterThan(0);
-  });
-
-  it('initializes auth session with correct parameters', () => {
-    render(<LogIn />);
+    const { getByTestId } = render(<LogIn />);
+    const button = getByTestId('login-button');
     
-    expect(AuthSession.useAuthRequest).toHaveBeenCalledWith(
-      expect.objectContaining({
-        clientId: 'test-client-id',
-        scopes: ['openid', 'profile', 'email'],
-        redirectUri: 'mock-redirect-uri',
-        responseType: 'code',
-        extraParams: {
-          audience: 'https://test.auth0.com/api/v2/'
-        }
-      }),
-      expect.objectContaining({
-        authorizationEndpoint: 'https://test.auth0.com/authorize',
-        tokenEndpoint: 'https://test.auth0.com/oauth/token'
-      })
-    );
+    expect(button.props.disabled).toBeTruthy();
   });
 
-  it('disables login button when request is not ready', () => {
-    // Mock request as not ready
-    AuthSession.useAuthRequest.mockImplementation(() => [
-      null,
-      null,
-      mockPromptAsync
-    ]);
-
-    const { getByText } = render(<LogIn />);
+  it('enables login button when auth request is ready', () => {
+    // Mock request as ready
+    require('expo-auth-session').useAuthRequest.mockReturnValueOnce([mockRequest, null, mockPromptAsync]);
     
-    // Find the login button and check if it's disabled
-    try {
-      const loginButton = getByText(/login/i).parent;
-      expect(loginButton.props.disabled).toBe(true);
-    } catch (error) {
-      // Alternative approach if parent doesn't have disabled prop
-      const loginButton = getByText(/login/i);
-      expect(loginButton.props.disabled || (loginButton.parent && loginButton.parent.props.disabled)).toBeTruthy();
-    }
+    const { getByTestId } = render(<LogIn />);
+    const button = getByTestId('login-button');
+    
+    expect(button.props.disabled).toBeFalsy();
   });
 
-  describe('Platform-specific behavior', () => {
-    describe('Web platform', () => {
-      beforeEach(() => {
-        // Mock Platform.OS as web
-        jest.spyOn(require('react-native').Platform, 'OS', 'get')
-          .mockReturnValue('web');
-          
-        // Mock window.location
-        const originalLocation = window.location;
-        delete window.location;
-        window.location = { 
-          href: '',
-          // Preserve original properties
-          ...originalLocation
-        };
+  describe('Web Platform', () => {
+    beforeEach(() => {
+      // Set platform to web
+      require('react-native').Platform.OS = 'web';
+      
+      // Mock window.location
+      global.window = {
+        location: { href: '' }
+      };
+    });
+
+    afterEach(() => {
+      delete global.window;
+    });
+
+    it('redirects to Auth0 with correct parameters on web', async () => {
+      const { getByTestId } = render(<LogIn />);
+      const button = getByTestId('login-button');
+      
+      await act(async () => {
+        fireEvent.press(button);
       });
 
-      it('redirects to Auth0 on web platform', async () => {
-        const { getByText } = render(<LogIn />);
-        
-        await act(async () => {
-          fireEvent.press(getByText(/login/i));
-        });
+      const expectedUrl = new URL('https://test.auth0.com/authorize');
+      expectedUrl.searchParams.append('client_id', 'test-client-id');
+      expectedUrl.searchParams.append('redirect_uri', 'https://test.redirect.uri');
+      expectedUrl.searchParams.append('response_type', 'code');
+      expectedUrl.searchParams.append('scope', 'openid profile email');
+      expectedUrl.searchParams.append('audience', 'https://test.auth0.com/api/v2/');
 
-        expect(window.location.href).toContain('https://test.auth0.com/authorize');
-        expect(window.location.href).toContain('client_id=test-client-id');
-        expect(window.location.href).toContain('redirect_uri=mock-redirect-uri');
+      expect(window.location.href).toBe(expectedUrl.toString());
+    });
+  });
+
+  describe('Native Platform', () => {
+    beforeEach(() => {
+      require('react-native').Platform.OS = 'ios';
+    });
+
+    it('calls promptAsync on native platforms', async () => {
+      const { getByTestId } = render(<LogIn />);
+      const button = getByTestId('login-button');
+      
+      await act(async () => {
+        fireEvent.press(button);
+      });
+
+      expect(mockPromptAsync).toHaveBeenCalled();
+    });
+
+    it('navigates to AuthRedirect on successful auth', async () => {
+      // Mock successful auth response
+      const mockResponse = {
+        type: 'success',
+        params: { code: 'test-auth-code' }
+      };
+      require('expo-auth-session').useAuthRequest.mockReturnValueOnce([
+        mockRequest,
+        mockResponse,
+        mockPromptAsync
+      ]);
+
+      render(<LogIn />);
+
+      // Wait for effect to run
+      await act(async () => {
+        await Promise.resolve();
+      });
+
+      expect(mockNavigate).toHaveBeenCalledWith('AuthRedirect', {
+        code: 'test-auth-code',
+        codeVerifier: 'test-verifier'
       });
     });
 
-    describe('Native platform', () => {
-      beforeEach(() => {
-        // Mock Platform.OS as ios
-        jest.spyOn(require('react-native').Platform, 'OS', 'get')
-          .mockReturnValue('ios');
+    it('handles auth error response', async () => {
+      // Mock console.error
+      const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+      
+      // Mock error response
+      const mockResponse = {
+        type: 'error',
+        error: 'test-error'
+      };
+      require('expo-auth-session').useAuthRequest.mockReturnValueOnce([
+        mockRequest,
+        mockResponse,
+        mockPromptAsync
+      ]);
+
+      render(<LogIn />);
+
+      // Wait for effect to run
+      await act(async () => {
+        await Promise.resolve();
       });
 
-      it('calls promptAsync on native platforms', async () => {
-        const { getByText } = render(<LogIn />);
-        
-        await act(async () => {
-          fireEvent.press(getByText(/login/i));
-        });
-
-        expect(mockPromptAsync).toHaveBeenCalled();
-      });
-
-      it('handles successful auth response', async () => {
-        const mockNavigate = jest.fn();
-        jest.spyOn(require('@react-navigation/native'), 'useNavigation')
-          .mockReturnValue({ navigate: mockNavigate });
-
-        // Mock successful auth response
-        AuthSession.useAuthRequest.mockImplementation(() => [
-          { codeVerifier: 'test-verifier' },
-          { 
-            type: 'success',
-            params: { code: 'test-auth-code' }
-          },
-          mockPromptAsync
-        ]);
-
-        render(<LogIn />);
-
-        // Let useEffect run
-        await act(async () => {});
-
-        expect(mockNavigate).toHaveBeenCalledWith('AuthRedirect', {
-          code: 'test-auth-code',
-          codeVerifier: 'test-verifier'
-        });
-      });
-
-      it('handles auth error response', async () => {
-        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-        
-        // Mock error auth response
-        AuthSession.useAuthRequest.mockImplementation(() => [
-          { codeVerifier: 'test-verifier' },
-          { 
-            type: 'error',
-            error: 'test-error'
-          },
-          mockPromptAsync
-        ]);
-
-        render(<LogIn />);
-
-        // Let useEffect run
-        await act(async () => {});
-
-        expect(consoleSpy).toHaveBeenCalledWith('Mobile auth error:', 'test-error');
-        consoleSpy.mockRestore();
-      });
+      expect(mockConsoleError).toHaveBeenCalledWith('Mobile auth error:', 'test-error');
+      mockConsoleError.mockRestore();
     });
   });
 }); 

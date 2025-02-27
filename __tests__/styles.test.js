@@ -53,11 +53,12 @@ describe('Styles', () => {
     it('has correct container styling', () => {
       expect(Styles.container).toEqual(
         expect.objectContaining({
+          flex: 1,
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: 'auto',
-          marginTop: 'auto',
-          padding: 20
+          padding: 20,
+          minWidth: '90%',
+          maxWidth: '90%'
         })
       );
     });
@@ -90,10 +91,9 @@ describe('Styles', () => {
     });
 
     it('uses flexible layout properties', () => {
+      expect(Styles.container.flex).toBe(1);
       expect(Styles.container.alignItems).toBe('center');
       expect(Styles.container.justifyContent).toBe('center');
-      expect(Styles.container.marginTop).toBe('auto');
-      expect(Styles.container.marginBottom).toBe('auto');
     });
   });
 

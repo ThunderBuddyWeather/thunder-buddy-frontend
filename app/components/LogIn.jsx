@@ -1,10 +1,9 @@
-import React from 'react';
-import { Text, Platform, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Platform, SafeAreaView, Pressable, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
-import * as AuthSession from 'expo-auth-session';
+import { useAppContext } from '../context/AppContext.jsx';
 import * as WebBrowser from 'expo-web-browser';
 import { useNavigation } from '@react-navigation/native';
-import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
 import authConfig from '../../auth0-config';
 import { COLORS } from '../../constants/COLORS';
@@ -77,8 +76,10 @@ export default function LogIn() {
         mode="contained"
         onPress={handleLogin}
         disabled={!request}
+        testID="login-button"
+        style={[styles.button, !request && styles.buttonDisabled]}
       >
-        <Text>Login</Text>
+        <Text style={styles.buttonText}>Login</Text>
       </Button>
     </SafeAreaView>
   );
@@ -103,11 +104,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
   },
   title: {
     fontSize: 24,

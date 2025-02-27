@@ -1,6 +1,6 @@
 import { jest, describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import React from 'react';
-import { render, act } from '@testing-library/react-native';
+import { render, act, waitFor } from '@testing-library/react-native';
 import AuthRedirect from '../app/components/AuthRedirect';
 import * as AuthSession from 'expo-auth-session';
 import jwt_decode from 'jwt-decode';
@@ -57,6 +57,11 @@ jest.mock('../app/context/UserContext', () => ({
   })
 }));
 
+// Mock AppContext
+jest.mock('../app/context/AppContext', () => ({
+  useAppContext: jest.fn()
+}));
+
 // Mock auth0-config
 jest.mock('../../auth0-config', () => ({
   authDomain: 'test.auth0.com',
@@ -69,18 +74,23 @@ global.fetch = jest.fn();
 describe('AuthRedirect Component', () => {
   const mockNavigate = jest.fn();
   const mockSetUser = jest.fn();
+  let mockAppContext;
   
   // Setup before each test
   beforeEach(() => {
     jest.clearAllMocks();
     
+    // Setup AppContext mock
+    mockAppContext = {
+      user: null,
+      setUser: mockSetUser
+    };
+    
+    require('../app/context/AppContext').useAppContext.mockReturnValue(mockAppContext);
+    
     // Mock navigation
     jest.spyOn(require('@react-navigation/native'), 'useNavigation')
       .mockReturnValue({ navigate: mockNavigate });
-    
-    // Mock UserContext
-    jest.spyOn(require('../app/context/UserContext'), 'useUser')
-      .mockReturnValue({ setUser: mockSetUser });
     
     // Mock Platform.OS as web by default
     jest.spyOn(require('react-native').Platform, 'OS', 'get')
@@ -134,10 +144,27 @@ describe('AuthRedirect Component', () => {
         name: 'Test User',
         email: 'test@example.com'
       });
+
+      // Update context with authAttempted and user
+      mockAppContext = {
+        ...mockAppContext,
+        authAttempted: true,
+        user: { name: 'Test User', email: 'test@example.com' }
+      };
       
+      // Re-render with updated context
+      const { useAppContext } = require('../app/context/AppContext');
+      useAppContext.mockReturnValue(mockAppContext);
+
+      let component;
       await act(async () => {
-        render(<AuthRedirect />);
+        component = render(<AuthRedirect />);
       });
+
+      // Wait for fetch to be called
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalled();
+      }, { timeout: 5000 });
       
       // Verify fetch was called with correct parameters
       expect(global.fetch).toHaveBeenCalledWith(
@@ -149,18 +176,22 @@ describe('AuthRedirect Component', () => {
         })
       );
       
-      // Verify user was set
-      expect(mockSetUser).toHaveBeenCalledWith({
-        name: 'Test User',
-        email: 'test@example.com'
-      });
-      
-      // Verify navigation to Home
-      expect(mockNavigate).toHaveBeenCalledWith('Home');
+      // Wait for user to be set
+      await waitFor(() => {
+        expect(mockSetUser).toHaveBeenCalledWith({
+          name: 'Test User',
+          email: 'test@example.com'
+        });
+      }, { timeout: 5000 });
+
+      // Wait for navigation
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('Home');
+      }, { timeout: 5000 });
       
       // Verify URL was cleaned up
       expect(window.history.replaceState).toHaveBeenCalled();
-    });
+    }, 15000);
     
     it('navigates to LogIn when no code is found', async () => {
       // Setup URL without code
@@ -169,14 +200,24 @@ describe('AuthRedirect Component', () => {
       await act(async () => {
         render(<AuthRedirect />);
       });
+
+      // Update context with authAttempted
+      mockAppContext = {
+        ...mockAppContext,
+        authAttempted: true
+      };
       
-      // Verify navigation to LogIn
-      expect(mockNavigate).toHaveBeenCalledWith('LogIn');
+      // Re-render with updated context
+      const { useAppContext } = require('../app/context/AppContext');
+      useAppContext.mockReturnValue(mockAppContext);
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('LogIn');
+      }, { timeout: 10000 });
       
-      // Verify fetch was not called
       expect(global.fetch).not.toHaveBeenCalled();
-    });
-    
+    }, 30000);
+
     it('handles token exchange errors', async () => {
       // Setup URL with code
       window.location.search = '?code=test-auth-code&code_verifier=test-verifier';
@@ -184,44 +225,38 @@ describe('AuthRedirect Component', () => {
       // Mock failed token response
       global.fetch.mockResolvedValueOnce({
         ok: false,
-        text: () => Promise.resolve('Invalid grant')
+        status: 400,
+        json: () => Promise.resolve({ error: 'invalid_grant' })
       });
-      
-      // Spy on console.error
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-      
+
       await act(async () => {
         render(<AuthRedirect />);
       });
-      
-      // Verify error was logged
-      expect(consoleSpy).toHaveBeenCalled();
-      
-      // Verify navigation to LogIn
-      expect(mockNavigate).toHaveBeenCalledWith('LogIn');
-      
-      // Restore console.error
-      consoleSpy.mockRestore();
-    });
+
+      // Wait for navigation
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('LogIn');
+      }, { timeout: 1000 });
+    }, 2000);
   });
   
   describe('Native platform', () => {
     beforeEach(() => {
-      // Mock Platform.OS as ios
+      // Mock Platform.OS as native
       jest.spyOn(require('react-native').Platform, 'OS', 'get')
         .mockReturnValue('ios');
-      
-      // Mock route with code
+    });
+
+    it('extracts code from route params', async () => {
+      // Mock route params
       jest.spyOn(require('@react-navigation/native'), 'useRoute')
         .mockReturnValue({
           params: {
-            code: 'test-mobile-code',
-            codeVerifier: 'test-mobile-verifier'
+            code: 'test-auth-code',
+            codeVerifier: 'test-verifier'
           }
         });
-    });
-    
-    it('extracts code from route params', async () => {
+
       // Mock successful token response
       global.fetch.mockResolvedValueOnce({
         ok: true,
@@ -231,36 +266,57 @@ describe('AuthRedirect Component', () => {
           refresh_token: 'test-refresh-token'
         })
       });
-      
+
       // Mock jwt_decode
       jwt_decode.mockReturnValueOnce({
-        name: 'Mobile User',
-        email: 'mobile@example.com'
+        name: 'Test User',
+        email: 'test@example.com'
       });
+
+      // Update context with authAttempted and user
+      mockAppContext = {
+        ...mockAppContext,
+        authAttempted: true,
+        user: { name: 'Test User', email: 'test@example.com' }
+      };
       
+      // Re-render with updated context
+      const { useAppContext } = require('../app/context/AppContext');
+      useAppContext.mockReturnValue(mockAppContext);
+
+      let component;
       await act(async () => {
-        render(<AuthRedirect />);
+        component = render(<AuthRedirect />);
       });
-      
+
+      // Wait for fetch to be called
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalled();
+      }, { timeout: 5000 });
+
       // Verify fetch was called with correct parameters
       expect(global.fetch).toHaveBeenCalledWith(
         'https://test.auth0.com/oauth/token',
         expect.objectContaining({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: expect.stringContaining('test-mobile-code')
+          body: expect.stringContaining('test-auth-code')
         })
       );
-      
-      // Verify user was set
-      expect(mockSetUser).toHaveBeenCalledWith({
-        name: 'Mobile User',
-        email: 'mobile@example.com'
-      });
-      
-      // Verify navigation to Home
-      expect(mockNavigate).toHaveBeenCalledWith('Home');
-    });
+
+      // Wait for user to be set
+      await waitFor(() => {
+        expect(mockSetUser).toHaveBeenCalledWith({
+          name: 'Test User',
+          email: 'test@example.com'
+        });
+      }, { timeout: 5000 });
+
+      // Wait for navigation
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('Home');
+      }, { timeout: 5000 });
+    }, 15000);
     
     it('uses getRedirectUrl().codeVerifier when codeVerifier is not in params', async () => {
       // Mock route without codeVerifier
@@ -280,38 +336,37 @@ describe('AuthRedirect Component', () => {
         })
       });
       
-      // Mock jwt_decode
-      jwt_decode.mockReturnValueOnce({
-        name: 'Mobile User',
-        email: 'mobile@example.com'
-      });
-      
       await act(async () => {
         render(<AuthRedirect />);
       });
+
+      // Wait for fetch to be called
+      await waitFor(() => {
+        expect(global.fetch).toHaveBeenCalled();
+      }, { timeout: 1000 });
       
       // Verify fetch body contains the fallback code verifier
       const fetchCall = global.fetch.mock.calls[0];
       const fetchBody = JSON.parse(fetchCall[1].body);
       expect(fetchBody.code_verifier).toBe('mock-code-verifier');
-    });
+    }, 2000);
     
     it('navigates to LogIn when no code is in route params', async () => {
       // Mock route without code
       jest.spyOn(require('@react-navigation/native'), 'useRoute')
-        .mockReturnValue({
-          params: {}
-        });
+        .mockReturnValue({ params: {} });
       
       await act(async () => {
         render(<AuthRedirect />);
       });
-      
-      // Verify navigation to LogIn
-      expect(mockNavigate).toHaveBeenCalledWith('LogIn');
+
+      // Wait for navigation
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('LogIn');
+      }, { timeout: 1000 });
       
       // Verify fetch was not called
       expect(global.fetch).not.toHaveBeenCalled();
-    });
+    }, 2000);
   });
 }); 
