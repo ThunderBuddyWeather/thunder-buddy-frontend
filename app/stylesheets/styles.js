@@ -26,7 +26,7 @@ const Styles = StyleSheet.create({
         justifyContent: 'center',
         maxWidth: '90%',
         minWidth: '90%',
-        padding: 20,
+        padding: 20
     },
     title: {
         fontSize: 24,
