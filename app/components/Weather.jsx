@@ -53,18 +53,18 @@ export default function Weather() {
 
   if(!user || !location){
     return (
-      <View><Text>Loading...</Text></View>
+      <View testID="weather-loading"><Text>Loading...</Text></View>
     )
   }
 
   return (
-    <View>
-      <Text>
+    <View testID="weather-container">
+      <Text testID="weather-location">
         {location
           ? `Location: ${location.coords.latitude} / ${location.coords.longitude}`
           : 'Waiting for location data...'}
       </Text>
-      <Text>
+      <Text testID="weather-wind">
         {currentWeather
           ? ` Wind Speed: ${currentWeather.data[0].wind_spd}`
           : ''}

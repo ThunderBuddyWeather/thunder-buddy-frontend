@@ -43,7 +43,12 @@ export default function LogOut() {
   return (
     <View style={styles.container}>
       {Platform.OS === 'ios' ? (
-        <TouchableOpacity onPress={handleLogout} activeOpacity={0.7} style={styles.button}>
+        <TouchableOpacity 
+          onPress={handleLogout} 
+          activeOpacity={0.7} 
+          style={styles.button}
+          testID="ios-logout-button"
+        >
           <Text style={styles.buttonText}>Log Out</Text>
         </TouchableOpacity>
       ) : (
@@ -52,6 +57,7 @@ export default function LogOut() {
           onPress={handleLogout}
           style={styles.button}
           labelStyle={styles.buttonText}
+          testID="non-ios-logout-button"
         >
           <Text>Log Out</Text>
         </Button>
