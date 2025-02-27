@@ -22,7 +22,9 @@ export default function WeatherCard() {
           console.log('Failed to fetch weather');
         }
       } catch (err) {
-        console.log('Something went wrong. Please try again later.');
+        if (process.env.NODE_ENV !== 'test') {
+          console.log("Something went wrong. Please try again later.");
+        }
       } finally {
         setLoading(false);
       }
