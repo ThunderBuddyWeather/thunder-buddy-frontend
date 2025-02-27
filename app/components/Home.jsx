@@ -1,19 +1,28 @@
-import React from 'react';
-import { Text, View} from 'react-native';
+import React,{useEffect} from 'react';
+import { Text, SafeAreaView, ScrollView } from 'react-native';
 import { Button } from 'react-native-paper';
-import { useUser } from '../context/UserContext.jsx';
+import { useAppContext } from '../context/AppContext.jsx';
 import { useNavigation } from '@react-navigation/native';
-import Weather from './Weather.jsx';
+import WeatherCard from './WeatherCard.jsx';
+import AlertCard from './AlertCard.jsx';
 import LogOut from './LogOut.jsx';
 import styles from '../stylesheets/styles.js';
 
 export default function Home() {
-  const { user } = useUser();
+  const { user } = useAppContext();
   const navigation = useNavigation();
 
   const handleLogIn = () => {
     navigation.navigate('LogIn');
   };
+
+  useEffect(() => {
+    console.log('user', user)
+    if(!user){
+      navigation.navigate('LogIn')
+      console.log('redirecting to login...')
+    }
+  }, [user, navigation])
 
   const LogIn = () => (
     <Button
@@ -27,15 +36,23 @@ export default function Home() {
   );
 
   return (
-    <View style={styles.container} testID="home-container">
-      <View style={styles.textContainer}>
+    <SafeAreaView style={{ flex: 1 }} testID="home-container">
+      <ScrollView 
+        contentContainerStyle={{
+          flexGrow: 1,
+          flexDirection: 'column',
+          alignItems: 'center',
+          padding: 20,
+          justifyContent: 'flex-start',
+        }}
+      >
         <Text style={styles.title}>
           {user ? `Welcome, ${user.name}!` : 'Please log in!'}
         </Text>
-        {user ? <Weather /> : null}
-      </View>
-
+        {user && <AlertCard />}
+        {user && <WeatherCard />}
+      </ScrollView>
       {user ? <LogOut /> : <LogIn />}
-    </View>
+    </SafeAreaView>
   );
 }

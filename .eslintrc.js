@@ -23,7 +23,8 @@ module.exports = {
   rules: {
     // Customize your rules here:
     'react/prop-types': 'off', // Disable prop-types requirement (if you're using TypeScript or prefer other validation)
-    'react-native/no-inline-styles': 'warn', // Warn against inline styles in React Native
+    'react-native/no-inline-styles': 'off', // Disable inline styles warning
+    'react-native/no-color-literals': 'off', // Disable color literals warning
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }], // Warn on unused variables, allow unused function args that start with _
   },
   settings: {
