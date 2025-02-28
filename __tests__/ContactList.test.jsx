@@ -1,9 +1,8 @@
-/* global describe, it, expect, jest, beforeEach */
+/* global describe, it, expect, jest */
 import React from 'react';
 import { render } from '@testing-library/react-native';
 import ContactList from '../app/components/ContactList';
-import { Image, Text } from 'react-native';
-import { Card, Avatar } from 'react-native-paper';
+import { Image } from 'react-native';
 
 // Mock react-native-paper components
 jest.mock('react-native-paper', () => {
@@ -17,7 +16,7 @@ jest.mock('react-native-paper', () => {
     Card,
     Avatar: {
       Icon: ({ size, icon, style }) => {
-        const AvatarIcon = ({ size, icon, style }) => React.createElement('div', { style }, icon);
+        const AvatarIcon = ({ icon, style }) => React.createElement('div', { style }, icon);
         AvatarIcon.displayName = 'Avatar.Icon';
         return AvatarIcon({ size, icon, style });
       }

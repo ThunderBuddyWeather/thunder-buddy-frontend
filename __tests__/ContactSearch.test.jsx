@@ -1,13 +1,12 @@
 import React from 'react';
 import { render, fireEvent, act } from '@testing-library/react-native';
-import { View, Text } from 'react-native';
 import ContactSearch from '../app/components/ContactSearch';
 import { jest, describe, beforeEach, afterEach, test, expect } from '@jest/globals';
 
 // Mock react-native-paper components
 jest.mock('react-native-paper', () => {
   const React = require('react');
-  const { View, Text } = require('react-native');
+  const { View } = require('react-native');
 
   const MockCard = ({ children, style }) => (
     <View style={style} testID="card">
@@ -186,7 +185,7 @@ describe('ContactSearch Component', () => {
     test('sends friend request when button is pressed', async () => {
       const mockOnSendFriendRequest = jest.fn();
       
-      const { getByPlaceholderText, getByText, getByTestId } = render(
+      const { getByPlaceholderText, getByText } = render(
         <ContactSearch 
           contacts={mockContacts} 
           myContacts={[]} 

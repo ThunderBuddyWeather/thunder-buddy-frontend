@@ -180,7 +180,7 @@ describe('AlertCard Component', () => {
     };
     global.fetch.mockResolvedValueOnce(mockResponse);
 
-    const { getByTestId } = render(<AlertCard />);
+    render(<AlertCard />);
 
     await waitFor(() => {
       expect(mockSetAlert).toHaveBeenCalledWith(mockAlert);

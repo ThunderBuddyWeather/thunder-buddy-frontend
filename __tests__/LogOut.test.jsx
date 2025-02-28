@@ -1,11 +1,9 @@
-/* global describe, it, expect, jest */
+/* global it, expect */
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import { Platform, Alert } from 'react-native';
-import * as WebBrowser from 'expo-web-browser';
-import LogOut from '../app/components/LogOut';
-import { useAppContext } from '../app/context/AppContext';
-import { jest, describe, beforeEach, afterEach } from '@jest/globals';
+import { render, fireEvent } from '@testing-library/react-native';
+import { Platform  } from 'react-native'; 
+import LogOut from '../app/components/LogOut'; 
+import { jest, describe, beforeEach } from '@jest/globals';
 
 // Create mock functions
 const mockNavigate = jest.fn();

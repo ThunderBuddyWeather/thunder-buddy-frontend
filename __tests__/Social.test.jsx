@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, act, fireEvent } from '@testing-library/react-native';
+import { render, act } from '@testing-library/react-native';
 import Social from '../app/components/Social';
 import { jest, describe, beforeEach, afterEach, test, expect } from '@jest/globals';
 
@@ -172,7 +172,7 @@ describe('Social Component', () => {
       throw new Error('Network error');
     });
 
-    const { getByText, UNSAFE_root: root } = render(<Social />);
+    const { UNSAFE_root: root } = render(<Social />);
     
     await act(async () => {
       try {
