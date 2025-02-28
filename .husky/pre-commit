@@ -7,10 +7,11 @@ npm run lint || {
     exit 1
 }
 
-echo "�� Running tests..."
-# Suppress specific warnings and run tests
-WARN_FILTERS="Warning: An update to .* inside a test was not wrapped in act|DEP0040|watchman warning"
-npm run test:ci 2>&1 | grep -vE "$WARN_FILTERS" || {
+echo "🧪 Running tests..."
+# Run tests with console output suppressed
+JEST_SILENT_REPORTER_SHOW_PATHS="true" \
+JEST_SILENT_REPORTER_SHOW_SUMMARY="true" \
+npm run test:ci -- --silent --reporters=jest-silent-reporter || {
     echo "❌ Tests failed. Please fix the tests before committing."
     exit 1
 }
