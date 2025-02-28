@@ -2,7 +2,7 @@
 // Additional test coverage for the Home component
 import React from 'react';
 import { render, waitFor, fireEvent } from '@testing-library/react-native';
-import { beforeEach } from '@jest/globals';
+import { beforeEach, afterEach } from '@jest/globals';
 import { act } from 'react-test-renderer';
 import { StyleSheet } from 'react-native';
 import { useAppContext } from '../app/context/AppContext';
@@ -26,33 +26,39 @@ jest.mock('expo-auth-session', () => ({
   ResponseType: { Code: 'code' }
 }));
 
-// Mock react-native-paper with all necessary components
+// Mock react-native-paper
 jest.mock('react-native-paper', () => {
-  const React = require('react');
-  const Card = ({ children, ...props }) => React.createElement('div', props, children);
-  Card.displayName = 'Card';
-  Card.Content = ({ children, ...props }) => React.createElement('div', props, children);
-  Card.Content.displayName = 'Card.Content';
-  Card.Title = ({ children, ...props }) => React.createElement('div', props, children);
-  Card.Title.displayName = 'Card.Title';
+  const mockComponent = (name) => {
+    const component = jest.fn().mockImplementation(({ children, testID }) => {
+      const { View } = require('react-native');
+      return <View testID={testID}>{children}</View>;
+    });
+    component.displayName = name;
+    return component;
+  };
+
+  const Card = mockComponent('Card');
+  Card.Content = mockComponent('Card.Content');
+  Card.Title = mockComponent('Card.Title');
+
+  const Button = jest.fn().mockImplementation(({ children, onPress, testID }) => {
+    const { View, Text } = require('react-native');
+    return (
+      <View testID={testID} onPress={onPress}>
+        {typeof children === 'string' ? <Text>{children}</Text> : children}
+      </View>
+    );
+  });
 
   return {
-    Button: ({ children, mode, onPress, style, labelStyle, ...props }) => {
-      const buttonChildren = React.Children.map(children, child => {
-        if (child && child.type && child.type.displayName === 'Text') {
-          return child.props.children;
-        }
-        return child;
-      });
-      return React.createElement('button', { onClick: onPress, style, ...props }, buttonChildren);
-    },
-    Provider: ({ children }) => React.createElement('div', null, children),
+    Button,
+    Provider: mockComponent('Provider'),
     Card,
-    Portal: ({ children }) => React.createElement('div', null, children),
-    Modal: ({ children, ...props }) => React.createElement('div', props, children),
-    Divider: ({ ...props }) => React.createElement('hr', props),
+    Portal: mockComponent('Portal'),
+    Modal: mockComponent('Modal'),
+    Divider: mockComponent('Divider'),
     Avatar: {
-      Icon: ({ ...props }) => React.createElement('div', props)
+      Icon: mockComponent('Avatar.Icon')
     }
   };
 });
@@ -60,6 +66,43 @@ jest.mock('react-native-paper', () => {
 // Mock the AppContext
 jest.mock('../app/context/AppContext', () => ({
   useAppContext: jest.fn()
+}));
+
+// Mock child components
+jest.mock('../app/components/WeatherCard', () => ({
+  __esModule: true,
+  default: jest.fn().mockImplementation(() => {
+    const { View, Text } = require('react-native');
+    return (
+      <View testID="weather-card">
+        <Text>Weather Card</Text>
+      </View>
+    );
+  })
+}));
+
+jest.mock('../app/components/AlertCard', () => ({
+  __esModule: true,
+  default: jest.fn().mockImplementation(() => {
+    const { View, Text } = require('react-native');
+    return (
+      <View testID="alert-card">
+        <Text>Alert Card</Text>
+      </View>
+    );
+  })
+}));
+
+jest.mock('../app/components/LogOut', () => ({
+  __esModule: true,
+  default: jest.fn().mockImplementation(() => {
+    const { View, Text } = require('react-native');
+    return (
+      <View testID="logout-component">
+        <Text>Log Out</Text>
+      </View>
+    );
+  })
 }));
 
 // Mock expo-location
@@ -76,12 +119,12 @@ jest.mock('@react-navigation/native', () => ({
   })
 }));
 
-describe('Additional Home Component Coverage', () => {
+describe('Home Component', () => {
+  let consoleLogSpy;
+
   beforeEach(() => {
-    // Clear all mocks
     jest.clearAllMocks();
-    
-    // Mock user context
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     useAppContext.mockReturnValue({
       user: null,
       setUser: jest.fn(),
@@ -92,43 +135,123 @@ describe('Additional Home Component Coverage', () => {
     });
   });
 
-  it('does not render login button when user is logged in', async () => {
-    // Set user in AppContext with weather and alert data
+  afterEach(() => {
+    consoleLogSpy.mockRestore();
+  });
+
+  it('renders welcome message for logged in user', async () => {
+    const mockUser = { name: 'Test User' };
     useAppContext.mockReturnValue({
-      user: { sub: 'test-user', name: 'Test User' },
+      user: mockUser,
+      setUser: jest.fn(),
       weather: null,
       alert: null,
       setWeather: jest.fn(),
       setAlert: jest.fn()
     });
 
-    const { queryByText } = render(<Home />);
+    const { getByText } = render(<Home />);
     
     await waitFor(() => {
-      expect(queryByText(/Log In/i)).toBeNull();
+      expect(getByText(`Welcome, ${mockUser.name}!`)).toBeTruthy();
     });
   });
 
-  it('renders login button when user is not logged in', async () => {
-    // Mock user context with null user
-    const mockSetUser = jest.fn();
+  it('renders login message when user is not logged in', async () => {
+    const { getByText } = render(<Home />);
+    
+    await waitFor(() => {
+      expect(getByText('Please log in!')).toBeTruthy();
+    });
+  });
+
+  it('renders WeatherCard and AlertCard when user is logged in', async () => {
     useAppContext.mockReturnValue({
-      user: null,
-      setUser: mockSetUser,
+      user: { name: 'Test User' },
+      setUser: jest.fn(),
       weather: null,
-      setWeather: jest.fn(),
       alert: null,
+      setWeather: jest.fn(),
+      setAlert: jest.fn()
+    });
+
+    const { getByTestId } = render(<Home />);
+    
+    await waitFor(() => {
+      expect(getByTestId('weather-card')).toBeTruthy();
+      expect(getByTestId('alert-card')).toBeTruthy();
+    });
+  });
+
+  it('does not render WeatherCard and AlertCard when user is not logged in', async () => {
+    const { queryByTestId } = render(<Home />);
+    
+    await waitFor(() => {
+      expect(queryByTestId('weather-card')).toBeNull();
+      expect(queryByTestId('alert-card')).toBeNull();
+    });
+  });
+
+  it('navigates to login when user is not logged in', async () => {
+    render(<Home />);
+    
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith('LogIn');
+      expect(consoleLogSpy).toHaveBeenCalledWith('user', null);
+      expect(consoleLogSpy).toHaveBeenCalledWith('redirecting to login...');
+    });
+  });
+
+  it('handles login button press', async () => {
+    const { getByTestId } = render(<Home />);
+    
+    await waitFor(() => {
+      const loginButton = getByTestId('login-button');
+      fireEvent.press(loginButton);
+      expect(mockNavigate).toHaveBeenCalledWith('LogIn');
+    });
+  });
+
+  it('shows LogOut component when user is logged in', async () => {
+    useAppContext.mockReturnValue({
+      user: { name: 'Test User' },
+      setUser: jest.fn(),
+      weather: null,
+      alert: null,
+      setWeather: jest.fn(),
+      setAlert: jest.fn()
+    });
+
+    const { getByTestId } = render(<Home />);
+    
+    await waitFor(() => {
+      expect(getByTestId('logout-component')).toBeTruthy();
+    });
+  });
+
+  it('shows Login button when user is not logged in', async () => {
+    const { getByTestId } = render(<Home />);
+    
+    await waitFor(() => {
+      expect(getByTestId('login-button')).toBeTruthy();
+    });
+  });
+
+  it('logs user state changes in useEffect', async () => {
+    const mockUser = { name: 'Test User' };
+    useAppContext.mockReturnValue({
+      user: mockUser,
+      setUser: jest.fn(),
+      weather: null,
+      alert: null,
+      setWeather: jest.fn(),
       setAlert: jest.fn()
     });
 
     render(<Home />);
-
-    // Wait for any state updates
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
+    
+    await waitFor(() => {
+      expect(consoleLogSpy).toHaveBeenCalledWith('user', mockUser);
     });
-
-    // Verify that navigation was attempted
-    expect(mockNavigate).toHaveBeenCalledWith('LogIn');
   });
 }); 

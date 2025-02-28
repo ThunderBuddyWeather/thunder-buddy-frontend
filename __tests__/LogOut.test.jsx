@@ -159,6 +159,10 @@ describe('LogOut Component', () => {
   });
 
   it('handles logout error on native platform', async () => {
+    // Mock console.error to prevent error output
+    const originalConsoleError = console.error;
+    console.error = jest.fn();
+
     Platform.OS = 'ios';
     const mockError = new Error('Test error');
     mockOpenAuthSessionAsync.mockRejectedValueOnce(mockError);
@@ -168,7 +172,12 @@ describe('LogOut Component', () => {
     
     await fireEvent.press(logoutButton);
     
+    // Assert that the error was handled
+    expect(console.error).toHaveBeenCalledWith('Logout error:', mockError);
     expect(mockSetUser).toHaveBeenCalledWith(null);
     expect(mockOpenAuthSessionAsync).toHaveBeenCalled();
+
+    // Restore console.error
+    console.error = originalConsoleError;
   });
 }); 

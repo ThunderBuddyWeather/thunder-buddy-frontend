@@ -2,18 +2,18 @@ import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Avatar, Card } from 'react-native-paper';
 
-export default function ContactSearch({ contacts, myContacts, onSendFriendRequest }) {
+export default function ContactSearch({ contacts = [], myContacts = [], onSendFriendRequest }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [requestStatus, setRequestStatus] = useState({});
 
   const handleFriendRequest = async (userId) => {
     setRequestStatus((prev) => ({ ...prev, [userId]: 'pending' }));
     try {
+      if (onSendFriendRequest) {
+        await onSendFriendRequest(userId);
+      }
       await new Promise((resolve) => setTimeout(resolve, 1500));
       setRequestStatus((prev) => ({ ...prev, [userId]: 'success' }));
-      if (onSendFriendRequest) {
-        onSendFriendRequest(userId);
-      }
     } catch (error) {
       setRequestStatus((prev) => ({ ...prev, [userId]: 'error' }));
       await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -43,18 +43,21 @@ export default function ContactSearch({ contacts, myContacts, onSendFriendReques
         )}
         <Text style={styles.contactName}>{item.username}</Text>
         <TouchableOpacity
+          testID="friend-button"
           style={[
             styles.friendButton,
             (requestStatus[item.userId] === 'pending' ||
-              requestStatus[item.userId] === 'success') && styles.friendButtonDisabled,
+              requestStatus[item.userId] === 'success' ||
+              requestStatus[item.userId] === 'error') && styles.friendButtonDisabled,
           ]}
           onPress={() => handleFriendRequest(item.userId)}
           disabled={
             requestStatus[item.userId] === 'pending' ||
-            requestStatus[item.userId] === 'success'
+            requestStatus[item.userId] === 'success' ||
+            requestStatus[item.userId] === 'error'
           }
         >
-          <Text style={styles.friendButtonText}>
+          <Text testID="friend-button-text" style={styles.friendButtonText}>
             {requestStatus[item.userId] === 'success' ? '✓' : '+'}
           </Text>
         </TouchableOpacity>

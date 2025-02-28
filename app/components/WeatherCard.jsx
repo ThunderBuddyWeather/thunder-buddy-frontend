@@ -6,6 +6,7 @@ import { useAppContext } from '../context/AppContext.jsx';
 export default function WeatherCard() {
   const { weather, setWeather } = useAppContext();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchWeather = async (latitude, longitude) => {
@@ -19,9 +20,11 @@ export default function WeatherCard() {
           setWeather(data.data[0]);
           console.log('Fetched weather:', data.data[0]);
         } else {
+          setError('Failed to fetch weather');
           console.log('Failed to fetch weather');
         }
       } catch (err) {
+        setError('Failed to fetch weather');
         if (process.env.NODE_ENV !== 'test') {
           console.log("Something went wrong. Please try again later.");
         }
@@ -31,15 +34,21 @@ export default function WeatherCard() {
     };
 
     const getLocationAndWeather = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('Please grant location permissions to use app.');
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setError('Please grant location permissions to use app.');
+          console.log('Please grant location permissions to use app.');
+          setLoading(false);
+          return;
+        }
+        const currentLocation = await Location.getCurrentPositionAsync({});
+        const { latitude, longitude } = currentLocation.coords;
+        await fetchWeather(latitude, longitude);
+      } catch (err) {
+        setError('Failed to get location');
         setLoading(false);
-        return;
       }
-      const currentLocation = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = currentLocation.coords;
-      await fetchWeather(latitude, longitude);
     };
 
     getLocationAndWeather();
@@ -49,6 +58,14 @@ export default function WeatherCard() {
     return (
       <View style={styles.loadingContainer}>
         <Text>Loading weather...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
       </View>
     );
   }
@@ -99,6 +116,22 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     marginTop: 8,
+  },
+  errorContainer: {
+    alignItems: 'center',
+    backgroundColor: '#ffebee',
+    borderColor: '#ef5350',
+    borderRadius: 8,
+    borderWidth: 1,
+    justifyContent: 'center',
+    maxWidth: '90%',
+    minWidth: '90%',
+    padding: 16,
+  },
+  errorText: {
+    color: '#c62828',
+    fontSize: 16,
+    textAlign: 'center',
   },
   icon: {
     height: '100%',
