@@ -1,6 +1,8 @@
 import { jest, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from '@jest/globals';
-import { fn } from 'jest-mock';
 import React from 'react';
+import { StyleSheet } from 'react-native';
+import { render, fireEvent, act } from '@testing-library/react-native';
+import LogIn from '../app/components/LogIn';
 
 // Update mock for react-native-paper to force Button to always have testID and data-testid as 'login-button'
 jest.mock('react-native-paper', () => {
@@ -21,8 +23,7 @@ jest.mock('react-native-paper', () => {
   };
 });
 
-/* Polyfill for StyleSheet.flatten and silence console.log to avoid async logging errors */
-import { StyleSheet } from 'react-native';
+/* Polyfill for StyleSheet.flatten */
 if (typeof StyleSheet.flatten !== 'function') {
   StyleSheet.flatten = (style) => style;
 }
@@ -40,9 +41,6 @@ jest.mock('../auth0-config', () => ({
   clientId: 'test-client-id',
   authDomain: 'test.auth0.com'
 }));
-
-import { render, fireEvent, act } from '@testing-library/react-native';
-import LogIn from '../app/components/LogIn';
 
 // Mock navigation
 const mockNavigate = jest.fn();

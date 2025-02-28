@@ -4,8 +4,6 @@ import { render, act } from '@testing-library/react-native';
 import AuthRedirect from '../app/components/AuthRedirect';
 import { useAppContext } from '../app/context/AppContext';
 import jwt_decode from 'jwt-decode';
-import * as AuthSession from 'expo-auth-session';
-import { Platform } from 'react-native';
 
 // Mock Platform
 jest.mock('react-native', () => ({
@@ -100,7 +98,7 @@ describe('AuthRedirect Component', () => {
   });
 
   it('handles mobile auth code from route params', async () => {
-    const { rerender } = render(<AuthRedirect />);
+    render(<AuthRedirect />);
 
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -111,7 +109,7 @@ describe('AuthRedirect Component', () => {
   });
 
   it('handles web auth code from URL', async () => {
-    const { rerender } = render(<AuthRedirect />);
+    render(<AuthRedirect />);
 
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -129,7 +127,7 @@ describe('AuthRedirect Component', () => {
       })
     );
 
-    const { rerender } = render(<AuthRedirect />);
+    render(<AuthRedirect />);
 
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -147,7 +145,7 @@ describe('AuthRedirect Component', () => {
     mockRouteParams = {};
     global.window.location.search = '';
 
-    const { rerender } = render(<AuthRedirect />);
+    render(<AuthRedirect />);
 
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -162,7 +160,7 @@ describe('AuthRedirect Component', () => {
       Promise.reject(new Error('Network error'))
     );
 
-    const { rerender } = render(<AuthRedirect />);
+    render(<AuthRedirect />);
 
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -183,7 +181,7 @@ describe('AuthRedirect Component', () => {
       setUser: mockSetUser
     }));
 
-    const { rerender } = render(<AuthRedirect />);
+    render(<AuthRedirect />);
 
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));

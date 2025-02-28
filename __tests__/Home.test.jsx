@@ -3,7 +3,6 @@
 import React from 'react';
 import { render, waitFor, fireEvent } from '@testing-library/react-native';
 import { beforeEach, afterEach } from '@jest/globals';
-import { act } from 'react-test-renderer';
 import { StyleSheet } from 'react-native';
 import { useAppContext } from '../app/context/AppContext';
 import Home from '../app/components/Home';
