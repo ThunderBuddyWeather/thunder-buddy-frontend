@@ -79,7 +79,6 @@ export default function LogIn() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Login</Text>
       <Button
         mode="contained"
         onPress={handleLogin}

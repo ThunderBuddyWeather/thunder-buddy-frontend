@@ -4,10 +4,11 @@ const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-
   const [weather, setWeather] = useState(null);
-
   const [alert, setAlert] = useState(null);
+  const [contacts, setContacts] = useState([]);
+  const [myContacts, setMyContacts] = useState([]);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
   return (
     <AppContext.Provider
@@ -18,6 +19,12 @@ export const AppProvider = ({ children }) => {
         setWeather,
         alert,
         setAlert,
+        contacts,
+        setContacts,
+        myContacts,
+        setMyContacts,
+        initialLoadComplete,
+        setInitialLoadComplete,
       }}
     >
       {children}

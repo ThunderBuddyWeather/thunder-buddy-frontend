@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import ContactList from './ContactList.jsx';
 import ContactSearch from './ContactSearch.jsx';
 
@@ -8,10 +8,10 @@ export default function Social() {
   const [myContacts, setMyContacts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Simulate fetching the full list of contacts from an API
   useEffect(() => {
     const fetchFullContacts = async () => {
       try {
-        // Simulated network delay
         await new Promise((resolve) => setTimeout(resolve, 1500));
         const data = [
           {
@@ -70,14 +70,14 @@ export default function Social() {
 
   if (loading) {
     return (
-      <View style={socialStyles.loadingContainer}>
+      <SafeAreaView style={socialStyles.loadingContainer}>
         <Text style={socialStyles.loadingText}>Loading contacts...</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={socialStyles.container}>
+    <SafeAreaView style={socialStyles.container}>
       <Text style={socialStyles.title}>Social Hub</Text>
       <ContactSearch
         contacts={fullContacts}
@@ -85,7 +85,7 @@ export default function Social() {
         onSendFriendRequest={handleSendFriendRequest}
       />
       <ContactList contacts={myContacts} />
-    </View>
+    </SafeAreaView>
   );
 }
 

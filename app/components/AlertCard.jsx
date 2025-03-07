@@ -97,11 +97,12 @@ export default function AlertCard() {
           </Card>
         </TouchableOpacity>
       ) : (
-        <Card style={{ width: '100%' }}>
-          <Card.Content>
-            <Text style={{ fontSize: 18, color: 'green' }}>No active alerts.</Text>
-          </Card.Content>
-        </Card>
+        // <Card style={{ width: '100%' }}>
+        //   <Card.Content>
+        //     <Text style={{ fontSize: 18, color: 'green' }}>No active alerts.</Text>
+        //   </Card.Content>
+        // </Card> 
+        ""
       )}
 
       <Button

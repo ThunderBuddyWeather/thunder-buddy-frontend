@@ -24,6 +24,7 @@ const linking = {
       Main: {
         screens: {
           Home: 'home',
+          Alerts: 'alerts',
           Social: 'social',
         },
       },
@@ -31,7 +32,6 @@ const linking = {
   },
 };
 
-// A wrapper to choose between auth and main flows
 function RootNavigator() {
   const { user } = useAppContext();
   return (
