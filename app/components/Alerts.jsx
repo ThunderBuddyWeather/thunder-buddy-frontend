@@ -51,9 +51,10 @@ export default function Alerts() {
     state_code: "FL",
     timezone: "America/New_York",
   };
-
+  
   useEffect(() => {
     const fetchAlerts = async () => {
+      console.log('fetching alerts')
       if (!weather || !weather.lat || !weather.lon) {
         console.log("Weather context not available or missing lat/lon");
         return;
@@ -63,12 +64,14 @@ export default function Alerts() {
         const response = await fetch(url);
         const data = await response.json();
         if (response.ok) {
-          if (data.alerts && data.alerts.length > 0) {
-            setAlert(data.alerts[0]);
-          } else {
-            setAlert(null);
-            console.log("No alerts from API, current alert state:", alert);
-          }
+          setAlert((prevAlert) => {
+            if (data.alerts && data.alerts.length > 0) {
+              return data.alerts[0];
+            } else {
+              console.log("No alerts from API, current alert state:", prevAlert);
+              return null;
+            }
+          });
         } else {
           console.log("Failed to fetch alerts:", data);
         }
@@ -77,7 +80,7 @@ export default function Alerts() {
       }
     };
     fetchAlerts();
-  }, [weather, setAlert]);
+  }, [weather]);
 
   const openLink = (uri) => {
     if (uri) {
@@ -125,7 +128,7 @@ export default function Alerts() {
                   ) : (
                     <Avatar.Icon
                       key={index}
-                      size={48} // Increased size (2x)
+                      size={48} 
                       icon="account"
                       style={styles.affectedContactIcon}
                     />
@@ -281,9 +284,6 @@ const styles = StyleSheet.create({
   noAlertText: {
     color: 'green',
     fontSize: 18,
-  },
-  scrollContainer: {
-    flex: 1,
   },
   wrapper: {
     marginLeft: 'auto',

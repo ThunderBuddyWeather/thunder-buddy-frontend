@@ -41,7 +41,7 @@ export default function AlertCard() {
     "state_code": "FL",
     "timezone": "America/New_York"
   };
-
+  
   useEffect(() => {
     const fetchAlerts = async () => {
       if (!weather || !weather.lat || !weather.lon) {
@@ -67,7 +67,7 @@ export default function AlertCard() {
       }
     };
     fetchAlerts();
-  }, [weather, setAlert, alert]);
+  }, [weather]);
 
   const openLink = (uri) => {
     if (uri) {
@@ -97,11 +97,6 @@ export default function AlertCard() {
           </Card>
         </TouchableOpacity>
       ) : (
-        // <Card style={{ width: '100%' }}>
-        //   <Card.Content>
-        //     <Text style={{ fontSize: 18, color: 'green' }}>No active alerts.</Text>
-        //   </Card.Content>
-        // </Card> 
         ""
       )}
 
