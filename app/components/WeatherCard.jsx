@@ -10,6 +10,7 @@ export default function WeatherCard() {
 
   useEffect(() => {
     const fetchWeather = async (latitude, longitude) => {
+      console.log('starting weather fetch')
       const API_KEY = 'bc03c97ff0b740569b8d21b93f241fa6';
       try {
         const response = await fetch(

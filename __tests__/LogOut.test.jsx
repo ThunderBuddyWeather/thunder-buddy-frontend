@@ -139,7 +139,7 @@ describe('LogOut Component', () => {
     expect(mockSetUser).toHaveBeenCalledWith(null);
     expect(mockOpenAuthSessionAsync).toHaveBeenCalledWith(
       expect.stringContaining('https://dev-qzpcmpfoi3fsel2m.us.auth0.com/v2/logout?client_id='),
-      'myapp%3A%2F%2F'
+      'myapp%3A%2F%2Fauth'
     );
   });
 

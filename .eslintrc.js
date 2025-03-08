@@ -12,7 +12,7 @@ module.exports = {
     ecmaVersion: 12, // Supports modern ECMAScript features
     sourceType: 'module',
   },
-  plugins: ['react', 'react-native'],
+  plugins: ['react', 'react-native', 'react-hooks'],
   extends: [
     'expo',
     'eslint:recommended', // Base ESLint recommended rules
@@ -29,6 +29,7 @@ module.exports = {
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }], // Warn on unused variables, allow unused function args that start with _
     'import/order': 'off', // Disable import order checking
     'sort-imports': 'off', // Disable sorting of import statements
+    'react-hooks/exhaustive-deps': 'off', // Disable exhaustive dependencies warning
   },
   settings: {
     react: {

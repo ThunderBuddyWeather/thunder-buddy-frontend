@@ -14,7 +14,7 @@ export default function LogOut() {
 
     const returnTo = Platform.OS === 'web'
       ? encodeURIComponent(window.location.origin)
-      : encodeURIComponent('myapp://'); 
+      : encodeURIComponent('myapp://auth'); 
 
     const logoutUrl = `https://${authDomain}/v2/logout?client_id=${clientId}&returnTo=${returnTo}`;
 
