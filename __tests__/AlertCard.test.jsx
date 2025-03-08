@@ -253,6 +253,87 @@ describe('AlertCard Component', () => {
     console.log = originalConsoleLog;
   });
 
+  it('handles case when weather data is missing', async () => {
+    // Mock missing weather data
+    useAppContext.mockReturnValue({
+      weather: null,
+      alert: null,
+      setAlert: mockSetAlert
+    });
+
+    // Mock console.log
+    const originalConsoleLog = console.log;
+    const mockLog = jest.fn();
+    console.log = mockLog;
+
+    render(<AlertCard />);
+
+    // Wait for the console log to be called
+    await waitFor(() => {
+      expect(mockLog).toHaveBeenCalledWith(
+        "Weather context not available or missing lat/lon"
+      );
+      // The fetch should not be called
+      expect(global.fetch).not.toHaveBeenCalled();
+    }, { timeout: 3000 });
+
+    // Restore console.log
+    console.log = originalConsoleLog;
+  });
+
+  it('handles case when weather.lat is missing', async () => {
+    // Mock missing lat
+    useAppContext.mockReturnValue({
+      weather: { lon: -74.0060 },  // only lon is present
+      alert: null,
+      setAlert: mockSetAlert
+    });
+
+    // Mock console.log
+    const originalConsoleLog = console.log;
+    const mockLog = jest.fn();
+    console.log = mockLog;
+
+    render(<AlertCard />);
+
+    // Wait for the console log to be called
+    await waitFor(() => {
+      expect(mockLog).toHaveBeenCalledWith(
+        "Weather context not available or missing lat/lon"
+      );
+      // The fetch should not be called
+      expect(global.fetch).not.toHaveBeenCalled();
+    }, { timeout: 3000 });
+
+    // Restore console.log
+    console.log = originalConsoleLog;
+  });
+
+  it('handles unsuccessful API response', async () => {
+    // Mock a failed API response
+    const errorResponse = { error: 'Invalid API key', code: 403 };
+    global.fetch.mockResolvedValueOnce({
+      ok: false,
+      json: jest.fn().mockResolvedValue(errorResponse)
+    });
+
+    // Mock console.log
+    const originalConsoleLog = console.log;
+    const mockLog = jest.fn();
+    console.log = mockLog;
+
+    render(<AlertCard />);
+
+    // Wait for the fetch to be called and error to be logged
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalled();
+      expect(mockLog).toHaveBeenCalledWith("Failed to fetch alerts:", errorResponse);
+    }, { timeout: 3000 });
+
+    // Restore console.log
+    console.log = originalConsoleLog;
+  });
+
   it('closes modal when Close button is pressed', async () => {
     useAppContext.mockImplementation(() => ({
       weather: mockWeather,
@@ -262,21 +343,60 @@ describe('AlertCard Component', () => {
 
     const { getByTestId, queryByTestId, getByText } = render(<AlertCard />);
     
+    // Wait for the component to render with alert
     await waitFor(() => {
       const cardTitle = getByTestId('card-title-text');
       expect(cardTitle.props.children).toBe(mockAlert.title);
-    }, { timeout: 3000 });
-
+    });
+    
     // Open modal
     await act(async () => {
       fireEvent.press(getByTestId('card-title-text'));
     });
+    
+    // Verify modal is open
     expect(queryByTestId('modal')).toBeTruthy();
     
     // Close modal
     await act(async () => {
       fireEvent.press(getByText('Close'));
     });
+    
+    // Verify modal is closed
     expect(queryByTestId('modal')).toBeNull();
+  });
+
+  it('displays alert information correctly in the modal', async () => {
+    useAppContext.mockImplementation(() => ({
+      weather: mockWeather,
+      alert: mockAlert,
+      setAlert: mockSetAlert
+    }));
+
+    const { getByTestId, getByText, getAllByText } = render(<AlertCard />);
+    
+    // Wait for the component to render with alert
+    await waitFor(() => {
+      const cardTitle = getByTestId('card-title-text');
+      expect(cardTitle.props.children).toBe(mockAlert.title);
+    });
+    
+    // Open modal
+    await act(async () => {
+      fireEvent.press(getByTestId('card-title-text'));
+    });
+    
+    // Verify modal is present
+    const modal = getByTestId('modal');
+    expect(modal).toBeTruthy();
+    
+    // Test just enough elements to ensure modal content is correct
+    // Use getAllByText to handle multiple elements with the same text
+    const titleElements = getAllByText(mockAlert.title);
+    expect(titleElements.length).toBeGreaterThan(0);
+    
+    // Verify buttons
+    expect(getByText('Close')).toBeTruthy();
+    expect(getByText('View Official Alert')).toBeTruthy();
   });
 }); 
