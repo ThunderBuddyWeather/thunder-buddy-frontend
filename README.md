@@ -1,4 +1,3 @@
-````
 # ThunderBuddyFrontend
 
 ThunderBuddyFrontend is an Expo-based React Native application that provides a simple login and home screen. It uses React Navigation for manual routing, React Native Paper for UI components, and NativeWind for Tailwind CSS styling.
@@ -26,10 +25,10 @@ Follow these instructions to clone the repository and set up the project for loc
 
 1. **Clone the Repository**
 
-   ```bash
-   git clone <repository-url>
-   cd ThunderBuddyFrontend
-````
+  ```bash
+  git clone <repository-url>
+  cd ThunderBuddyFrontend
+  ```
 
 2. **Install Dependencies**
 

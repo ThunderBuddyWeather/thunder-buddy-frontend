@@ -30,6 +30,7 @@ export default function Home() {
       onPress={handleLogIn}
       style={styles.button}
       labelStyle={styles.buttonText}
+      testID="login-button"
     >
       <Text>Log In</Text>
     </Button>
