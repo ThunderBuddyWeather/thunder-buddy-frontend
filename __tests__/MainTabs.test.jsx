@@ -26,6 +26,7 @@ jest.mock('@expo/vector-icons', () => ({
 // Mock the screen components
 jest.mock('../app/components/Home', () => () => 'Home');
 jest.mock('../app/components/Social', () => () => 'Social');
+jest.mock('../app/components/Alerts', () => () => 'Alerts');
 
 describe('MainTabs Component', () => {
   const renderWithNavigation = (component) => {
@@ -36,13 +37,14 @@ describe('MainTabs Component', () => {
     );
   };
 
-  test('renders both Home and Social tabs', () => {
+  test('renders Home, Alerts, and Social tabs', () => {
     const { UNSAFE_root: root } = renderWithNavigation(<MainTabs />);
     const screens = root.findAllByType('mock-screen');
 
-    expect(screens).toHaveLength(2);
+    expect(screens).toHaveLength(3);
     expect(screens[0].props.name).toBe('Home');
-    expect(screens[1].props.name).toBe('Social');
+    expect(screens[1].props.name).toBe('Alerts');
+    expect(screens[2].props.name).toBe('Social');
   });
 
   test('configures tab screens with correct options', () => {
@@ -65,7 +67,7 @@ describe('MainTabs Component', () => {
     // Test screenOptions with Home route
     const homeOptions = screenOptions({ route: { name: 'Home' } });
     expect(homeOptions).toEqual(expect.objectContaining({
-      tabBarActiveTintColor: 'tomato',
+      tabBarActiveTintColor: 'green',
       tabBarInactiveTintColor: 'gray',
     }));
 
