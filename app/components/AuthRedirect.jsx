@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Platform } from 'react-native';
 import * as AuthSession from 'expo-auth-session';
@@ -9,7 +9,7 @@ import { authDomain, clientId } from '../../auth0-config';
 export default function AuthRedirect() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { user, setUser } = useAppContext();
+  const { user, setUser, setAuthToken } = useAppContext();  
   const [authAttempted, setAuthAttempted] = useState(false);
 
   useEffect(() => {
@@ -55,6 +55,9 @@ export default function AuthRedirect() {
           const tokens = await tokenResponse.json();
           console.log("Tokens received:", tokens);
   
+          // Save the id_token (or access_token) in context
+          setAuthToken(tokens.id_token); // Save the token here
+
           const decodedClaims = jwt_decode(tokens.id_token);
           console.log("Decoded user claims:", decodedClaims);
           setUser(decodedClaims);
@@ -74,7 +77,7 @@ export default function AuthRedirect() {
     };
 
     handleAuthRedirect();
-  }, [route, setUser]);
+  }, [route, setUser, setAuthToken]);
 
   useEffect(() => {
     if (authAttempted) {

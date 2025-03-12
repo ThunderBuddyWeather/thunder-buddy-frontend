@@ -7,6 +7,7 @@ import LogIn from './app/components/LogIn';
 import AuthRedirect from './app/components/AuthRedirect';
 import { AppProvider, useAppContext } from './app/context/AppContext.jsx';
 import MainTabs from './app/components/MainTabs';
+import Preloader from './app/components/Preloader.jsx'
 
 const Stack = createNativeStackNavigator();
 
