@@ -21,6 +21,7 @@ export default function WeatherCard() {
           source={{ uri: weatherbitIconUrl }}
           style={styles.icon}
           alt={condition}
+          resizeMode="contain" 
         />
         <Text style={styles.tempOverlay}>{temp}°C</Text>
       </View>
@@ -55,7 +56,6 @@ const styles = StyleSheet.create({
   },
   icon: {
     height: '100%',
-    resizeMode: 'contain',
     width: '100%',
   },
   iconContainer: {

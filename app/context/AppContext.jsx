@@ -13,6 +13,7 @@ export const AppProvider = ({ children }) => {
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [loading, setLoading] = useState(true);
 
+
   const fetchWeather = async (latitude, longitude) => {
     console.log('starting weather fetch');
     const API_KEY = 'bc03c97ff0b740569b8d21b93f241fa6';
@@ -45,74 +46,82 @@ export const AppProvider = ({ children }) => {
     const { latitude, longitude } = currentLocation.coords;
     // await fetchWeather(latitude, longitude);
     setWeather({  
-      "data":[  
-         {  
-            "wind_cdir":"NE",
-            "rh":59,
-            "pod":"d",
-            "lon":-78.63861,
-            "pres":1006.6,
-            "timezone":"America\/New_York",
-            "ob_time":"2017-08-28 16:45",
-            "country_code":"US",
-            "clouds":75,
-            "vis":10,
-            "wind_spd":6.17,
-            "gust": 8,
-            "wind_cdir_full":"northeast",
-            "app_temp":24.25,
-            "state_code":"NC",
-            "ts":1503936000,
-            "h_angle":0,
-            "dewpt":15.65,
-            "weather":{  
-               "icon":"c03d",
-               "code": 803,
-               "description":"Broken clouds"
-            },
-            "uv":2,
-            "aqi":45,
-            "station":"CMVN7",
-            "sources": ["rtma", "CMVN7"],
-            "wind_dir":50,
-            "elev_angle":63,
-            "datetime":"2017-08-28:17",
-            "precip":0,
-            "ghi":444.4,
-            "dni":500,
-            "dhi":120,
-            "solar_rad":350,
-            "city_name":"Raleigh",
-            "sunrise":"10:44",
-            "sunset":"23:47",
-            "temp":24.19,
-            "lat":35.7721,
-            "slp":1022.2
-         }
-      ],
-      "minutely":[],
-      "count":1
+      "wind_cdir":"NE",
+      "rh":59,
+      "pod":"d",
+      "lon":-78.63861,
+      "pres":1006.6,
+      "timezone":"America\/New_York",
+      "ob_time":"2017-08-28 16:45",
+      "country_code":"US",
+      "clouds":75,
+      "vis":10,
+      "wind_spd":6.17,
+      "gust": 8,
+      "wind_cdir_full":"northeast",
+      "app_temp":24.25,
+      "state_code":"NC",
+      "ts":1503936000,
+      "h_angle":0,
+      "dewpt":15.65,
+      "weather":{  
+         "icon":"c03d",
+         "code": 803,
+         "description":"Broken clouds"
+      },
+      "uv":2,
+      "aqi":45,
+      "station":"CMVN7",
+      "sources": ["rtma", "CMVN7"],
+      "wind_dir":50,
+      "elev_angle":63,
+      "datetime":"2017-08-28:17",
+      "precip":0,
+      "ghi":444.4,
+      "dni":500,
+      "dhi":120,
+      "solar_rad":350,
+      "city_name":"Raleigh",
+      "sunrise":"10:44",
+      "sunset":"23:47",
+      "temp":24.19,
+      "lat":35.7721,
+      "slp":1022.2
    })
   };
 
+  const fetchFriends = async () => {
+    try {
+      const currentUsername = user.nickname || user.name;
+      const url = `http://127.0.0.1:5000/api/friendship/friends/${currentUsername}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      if (response.ok) {
+        setContacts(data.friends || []);
+      } 
+    } catch (err) {
+      console.log('Failed to fetch contacts', err.message)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   const pushUser = async () => {
     try {
-      // Build the payload using values from your user and weather states.
-      // We add all fields required by your model, using empty strings as defaults.
       const payload = {
         user_id: user.sub,
-        user_username: user.nickname || user.name,  // Use nickname if available
+        user_username: user.nickname || user.name,  
         user_name: user.name,
         user_email: user.email,
-        user_phone: user.phone || "",              // Default to empty string if not provided
+        user_phone: user.phone || "",     
         user_address: user.address || "",
         user_location: `${weather.lat} ${weather.lon}`,
-        user_weather: weather.weather || "good",   // You could extract a description if available
-        user_severe_weather_alert: user.severe_weather_alert || "", // Default empty
+        user_weather: JSON.stringify(weather.weather) || "",
+        user_severe_weather_alert: user.severe_weather_alert || "",
         user_profile_picture: user.picture,
       };
   
-      // Replace with your server's URL/IP and correct port (do not use the database port)
       const response = await fetch(
         `http://127.0.0.1:5000/api/user_account/profile`,
         {
@@ -142,11 +151,13 @@ export const AppProvider = ({ children }) => {
     getLocationAndWeather();
   }, []);
 
-  // This effect will only trigger pushUser when user, weather, and authToken are all set.
   useEffect(() => {
     if (user && weather && authToken) {
       console.log(authToken)
-      pushUser();
+      pushUser().then(() => {
+        fetchFriends();
+        console.log(contacts)
+      })
     }
   }, [user, weather, authToken]);
 

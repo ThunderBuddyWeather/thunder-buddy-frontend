@@ -1,11 +1,13 @@
 import React from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Avatar, Card } from 'react-native-paper';
+import { useAppContext } from '../context/AppContext.jsx';
 
-export default function ContactList({ contacts }) {
+export default function ContactList() {
+  const { contacts } = useAppContext();
   const ContactCard = ({ contact }) => {
-    const { name, weatherIcon, alert, picture } = contact;
-    const weatherIconUrl = `https://www.weatherbit.io/static/img/icons/${weatherIcon}.png`;
+    const { alert, name, picture, user_id, username, weather } = contact;
+    // const weatherIconUrl = `https://www.weatherbit.io/static/img/icons/${weatherIcon}.png`;
 
     return (
       <Card style={styles.card}>
@@ -21,7 +23,7 @@ export default function ContactList({ contacts }) {
           )}
           <Text style={styles.nameText}>{name}</Text>
           <Image
-            source={{ uri: weatherIconUrl }}
+            source={{ uri: picture }}
             resizeMode="contain"
             style={styles.weatherImage}
           />
@@ -43,7 +45,7 @@ export default function ContactList({ contacts }) {
       <Text style={styles.title}>Contacts</Text>
       <ScrollView style={styles.scrollContainer}>
         {contacts.map((contact) => (
-          <ContactCard key={contact.userId} contact={contact} />
+          <ContactCard key={contact.user_id} contact={contact} />
         ))}
       </ScrollView>
     </View>
@@ -60,7 +62,8 @@ const styles = StyleSheet.create({
     borderColor: '#D1D5DB',
     borderRadius: 12,
     borderWidth: 1,
-    margin: 16,
+    margin: 'auto',
+    maxWidth: 400
   },
   cardContent: {
     alignItems: 'center',

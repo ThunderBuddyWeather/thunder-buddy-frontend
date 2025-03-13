@@ -124,6 +124,7 @@ export default function Alerts() {
                       key={index}
                       source={{ uri: contact.picture }}
                       style={styles.affectedContactImage}
+                      
                     />
                   ) : (
                     <Avatar.Icon
