@@ -1,50 +1,149 @@
-# Welcome to your Expo app 👋
+# ThunderBuddyFrontend
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+ThunderBuddyFrontend is an Expo-based React Native application that provides a simple login and home screen. It uses React Navigation for manual routing, React Native Paper for UI components, and NativeWind for Tailwind CSS styling.
 
-## Get started
+![ThunderBuddyFrontend Mockup](ThunderBuddyFrontendMockup.png)
 
-1. Install dependencies
+## Features
+
+- **Login & Home Screens**: A login screen that simulates authentication (using a fake API) and a home screen that greets the user.
+- **Manual Routing with React Navigation**: Uses a native stack navigator to manage screen transitions.
+- **Context API for State Management**: Manages user state (username) with React’s Context API.
+- **Tailwind Styling via NativeWind**: Applies utility-first styling using NativeWind, which integrates Tailwind CSS classes into React Native.
+
+## Getting Started
+
+Follow these instructions to clone the repository and set up the project for local development.
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v20 recommended)
+- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+- [Expo CLI](https://docs.expo.dev/workflow/expo-cli/) (use `npx expo` to run commands locally; avoid using the legacy global expo-cli)
+
+### Installation
+
+1. **Clone the Repository**
+
+  ```bash
+  git clone <repository-url>
+  cd ThunderBuddyFrontend
+  ```
+
+2. **Install Dependencies**
+
+   Using npm:
 
    ```bash
    npm install
    ```
 
-2. Start the app
+   Or using yarn:
 
    ```bash
-    npx expo start
+   yarn install
    ```
 
-In the output, you'll find options to open the app in a
+3. **Set Up Tailwind (NativeWind)**
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   Make sure you have the following configuration files in your project root:
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+   **babel.config.js**
 
-## Get a fresh project
+   ```js
+   module.exports = function (api) {
+     api.cache(true);
+     return {
+       presets: ['babel-preset-expo'],
+       plugins: ['nativewind/babel'],
+     };
+   };
+   ```
 
-When you're ready, run:
+   **tailwind.config.js**
 
-```bash
-npm run reset-project
+   ```js
+   /** @type {import('tailwindcss').Config} */
+   module.exports = {
+     content: [
+       './App.{js,jsx,ts,tsx}',
+       './components/**/*.{js,jsx,ts,tsx}',
+       './screens/**/*.{js,jsx,ts,tsx}',
+     ],
+     theme: {
+       extend: {},
+     },
+     plugins: [],
+   };
+   ```
+
+   **postcss.config.js**
+
+   ```js
+   module.exports = {
+     plugins: {
+       tailwindcss: {},
+       autoprefixer: {},
+     },
+   };
+   ```
+
+4. **Run the Project**
+
+   Start the Expo development server and clear the cache:
+
+   ```bash
+   npx expo start -c
+   ```
+
+   This command will launch Expo and provide options to open the app on an Android emulator, iOS simulator, or on a physical device via QR code.
+
+## Project Structure
+
+```
+ThunderBuddyFrontend/
+├── App.js
+├── package.json
+├── babel.config.js
+├── tailwind.config.js
+├── postcss.config.js
+├── app/
+│   └── components/
+│       ├── Home.js
+│       └── LogIn.js
+├── context/
+│   └── UserContext.jsx
+├── assets/
+│   └── images/
+│       ├── icon.png
+│       ├── adaptive-icon.png
+│       ├── splash-icon.png
+│       └── favicon.png  (optional – if not provided, remove favicon reference in app.json)
+└── ThunderBuddyFrontendMockup.png
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Troubleshooting
 
-## Learn more
+- **Favicon Error on Web**:  
+  If you encounter an error related to a missing favicon, either add a favicon image at `./assets/images/favicon.png` or remove the `"favicon"` property from your Expo configuration.
 
-To learn more about developing your project with Expo, look at the following resources:
+- **Clearing Cache**:  
+  If unexpected behavior occurs, try restarting with a clear cache:
+  ```bash
+  npx expo start -c
+  ```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Learn More
 
-## Join the community
+- [Expo Documentation](https://docs.expo.dev/)
+- [React Navigation Documentation](https://reactnavigation.org/)
+- [NativeWind Documentation](https://www.nativewind.dev/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/)
 
-Join our community of developers creating universal apps.
+## License
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+This project is open source and available under the [MIT License](LICENSE).
+
+```
+
+```
