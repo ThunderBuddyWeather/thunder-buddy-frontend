@@ -3,11 +3,9 @@ import { View, Text, Linking, ScrollView, TouchableOpacity } from 'react-native'
 import { Card, Modal, Portal, Button, Avatar, Divider } from 'react-native-paper';
 import { useAppContext } from '../context/AppContext.jsx';
 
-const API_KEY = 'bc03c97ff0b740569b8d21b93f241fa6';
-
 export default function AlertCard() {
   const [visible, setVisible] = useState(false);
-  const { weather, alert, setAlert } = useAppContext();  
+  const { alert, setAlert } = useAppContext();  
 
   // Dummy alert for testing
   const dummyAlert = {

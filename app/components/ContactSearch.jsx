@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, SafeAreaView, View } from 'react-native';
+import { StyleSheet, Text, TextInput, SafeAreaView, View, Platform } from 'react-native';
 import { useAppContext } from '../context/AppContext';
+
+const BASE_URL = Platform.OS === 'web'
+  ? "http://localhost:5000"
+  : `http://${process.env.DEV_IP}:5000`;
+  
 
 export default function ContactSearch() {
   const { user } = useAppContext();
@@ -20,7 +25,7 @@ export default function ContactSearch() {
     
     try {
       const currentUsername = user.nickname || user.name;
-      const url = `http://127.0.0.1:5000/api/friendship/request/${currentUsername}+${friendCode}`;
+      const url = `${BASE_URL}/api/friendship/request/${currentUsername}+${friendCode}`;
       
       const response = await fetch(url, {
         method: 'POST',
@@ -71,7 +76,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 200,
     marginLeft: 'auto',
-    marginRight: 'auto'
+    marginRight: 'auto',
   },
   input: {
     flex: 1,
@@ -82,7 +87,7 @@ const styles = StyleSheet.create({
     width: 50,
     marginLeft: 'auto',
     marginRight: 'auto',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   checkmark: {
     marginLeft: 8,
