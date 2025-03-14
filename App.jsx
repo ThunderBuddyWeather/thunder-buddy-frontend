@@ -46,7 +46,7 @@ function RootNavigator() {
         <Stack.Screen name="Main" component={MainTabs} />
       )}
     </Stack.Navigator>
-  );
+   );
 }
 
 export default function App() {

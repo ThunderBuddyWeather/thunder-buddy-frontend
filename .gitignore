@@ -39,3 +39,7 @@ app-example
 .expo
 
 coverage
+
+
+
+.env

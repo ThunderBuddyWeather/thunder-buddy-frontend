@@ -5,3 +5,11 @@ module.exports = function (api) {
     plugins: ['nativewind/babel'],
   };
 };
+
+
+module.exports = {
+  presets: ['module:metro-react-native-babel-preset'],
+  plugins: [
+    ['module:react-native-dotenv'],
+  ],
+};
