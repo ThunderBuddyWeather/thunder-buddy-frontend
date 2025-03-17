@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, Linking, ScrollView, TouchableOpacity } from 'react-native';
 import { Card, Modal, Portal, Button, Avatar, Divider } from 'react-native-paper';
 import { useAppContext } from '../context/AppContext.jsx';
