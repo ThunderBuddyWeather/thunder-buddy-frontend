@@ -5,7 +5,7 @@ const API_KEY = process.env.API_KEY;
 
 // Helper: BASE_URL is passed as an argument to each function.
 export const fetchWeather = async ({ queryKey }) => {
-  const [{ latitude, longitude }] = queryKey;
+  const [_key, { latitude, longitude }] = queryKey;
   const response = await fetch(
     `https://api.weatherbit.io/v2.0/current?lat=${latitude}&lon=${longitude}&key=${API_KEY}&include=minutely`
   );
@@ -24,7 +24,7 @@ export const useWeather = (latitude, longitude) => {
 };
 
 export const fetchFriends = async ({ queryKey }) => {
-  const [{ currentUsername, BASE_URL }] = queryKey;
+  const [_key, { currentUsername, BASE_URL }] = queryKey;
   const response = await fetch(`${BASE_URL}/api/friendship/friends/${currentUsername}`);
   const data = await response.json();
   if (!response.ok) {
@@ -85,7 +85,7 @@ export const usePushUser = (BASE_URL, authToken) => {
 };
 
 export const fetchFriendRequests = async ({ queryKey }) => {
-    const [{ username, BASE_URL, authToken }] = queryKey;
+    const [_key, { username, BASE_URL, authToken }] = queryKey;
     const response = await fetch(`${BASE_URL}/api/friendship/requests/${username}`, {
       headers: { Authorization: `Bearer ${authToken}` },
     });
