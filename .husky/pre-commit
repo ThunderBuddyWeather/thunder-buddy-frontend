@@ -1,0 +1,19 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running ESLint..."
+npm run lint || {
+    echo "❌ ESLint failed. Please fix the linting issues before committing."
+    exit 1
+}
+
+echo "🧪 Running tests..."
+# Run tests with console output suppressed
+JEST_SILENT_REPORTER_SHOW_PATHS="true" \
+JEST_SILENT_REPORTER_SHOW_SUMMARY="true" \
+npm run test:ci -- --silent --reporters=jest-silent-reporter || {
+    echo "❌ Tests failed. Please fix the tests before committing."
+    exit 1
+}
+
+echo "✅ Pre-commit checks passed!" 
