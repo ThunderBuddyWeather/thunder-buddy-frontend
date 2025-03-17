@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Linking, ScrollView, TouchableOpacity } from 'react-native';
 import { Card, Modal, Portal, Button, Avatar, Divider } from 'react-native-paper';
 import { useAppContext } from '../context/AppContext.jsx';
+import { pushUser } from '../queries.js';
 
 export default function AlertCard() {
   const [visible, setVisible] = useState(false);
   const { alert, setAlert } = useAppContext();  
+  const { weatherCoords, authToken, user, BASE_URL, expoPushToken } = useAppContext();
 
-  // Dummy alert for testing
   const dummyAlert = {
     alerts: [
       {
@@ -38,10 +39,9 @@ export default function AlertCard() {
     timezone: "America/New_York"
   };
 
-  // For testing, we set the alert to dummy alert.
-  useEffect(() => {
-    setAlert(dummyAlert.alerts[0]);
-  }, [setAlert]);
+  // useEffect(() => {
+  //   setAlert(dummyAlert.alerts[0]);
+  // }, [setAlert]);
 
   const openModal = () => setVisible(true);
   const closeModal = () => setVisible(false);
@@ -79,7 +79,27 @@ export default function AlertCard() {
 
       <Button
         mode="contained"
-        onPress={() => setAlert(dummyAlert.alerts[0])}
+        onPress={() => {
+          setAlert(dummyAlert.alerts[0])
+          const payload = {
+            user_id: user.sub,
+            user_username: user.nickname || user.name,
+            user_name: user.name,
+            user_email: user.email,
+            user_phone: user.phone || "",
+            user_address: user.address || "",
+            user_location: weatherCoords ? `${weatherCoords.latitude} ${weatherCoords.longitude}` : "",
+            user_severe_weather_alert: JSON.stringify(alert),
+            expo_push_token: expoPushToken,
+          };
+          pushUser({ payload, BASE_URL, authToken })
+            .then((data) => {
+              console.log("User pushed successfully:", data);
+            })
+            .catch((err) => {
+              console.error("Error pushing user:", err);
+            });
+        }}
         style={{ marginTop: 10 }}
       >
         <Text>Use Dummy Alert</Text>

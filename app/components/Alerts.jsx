@@ -18,7 +18,6 @@ export default function Alerts() {
   const [visible, setVisible] = useState(false);
   const { weather, alert, setAlert } = useAppContext();
 
-  // Dummy alert with affectedContacts added:
   const dummyAlert = {
     alerts: [
       {

@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, SafeAreaView, View, Platform } from 'react-native';
+import { StyleSheet, Text, TextInput, SafeAreaView, View } from 'react-native';
 import { useAppContext } from '../context/AppContext';
 
-const BASE_URL = Platform.OS === 'web'
-  ? "http://localhost:5000"
-  : `http://${process.env.DEV_IP}:5000`;
-  
-
 export default function ContactSearch() {
-  const { user } = useAppContext();
+  const { user, BASE_URL } = useAppContext();
   const [friendCode, setFriendCode] = useState('');
   const [status, setStatus] = useState('idle'); // idle, pending, success, error
   const [serverMessage, setServerMessage] = useState(null);
@@ -27,9 +22,7 @@ export default function ContactSearch() {
       const currentUsername = user.nickname || user.name;
       const url = `${BASE_URL}/api/friendship/request/${currentUsername}+${friendCode}`;
       
-      const response = await fetch(url, {
-        method: 'POST',
-      });
+      const response = await fetch(url, { method: 'POST' });
       const data = await response.json();
       
       if (response.ok) {

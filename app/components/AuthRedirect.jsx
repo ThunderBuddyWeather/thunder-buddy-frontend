@@ -55,8 +55,7 @@ export default function AuthRedirect() {
           const tokens = await tokenResponse.json();
           console.log("Tokens received:", tokens);
   
-          // Save the id_token (or access_token) in context
-          setAuthToken(tokens.id_token); // Save the token here
+          setAuthToken(tokens.id_token); 
 
           const decodedClaims = jwt_decode(tokens.id_token);
           console.log("Decoded user claims:", decodedClaims);
