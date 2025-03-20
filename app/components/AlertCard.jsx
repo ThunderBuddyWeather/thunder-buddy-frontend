@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Linking, ScrollView, TouchableOpacity } from 'react-native';
 import { Card, Modal, Portal, Button, Avatar, Divider } from 'react-native-paper';
 import { useAppContext } from '../context/AppContext.jsx';
@@ -39,9 +39,29 @@ export default function AlertCard() {
     timezone: "America/New_York"
   };
 
-  // useEffect(() => {
-  //   setAlert(dummyAlert.alerts[0]);
-  // }, [setAlert]);
+  useEffect(() => {
+    if (weatherCoords && weatherCoords.latitude && weatherCoords.longitude) {
+      fetch(`${BASE_URL}/api/weather-alerts?lat=${weatherCoords.latitude}&lon=${weatherCoords.longitude}`)
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(errorData => {
+              throw errorData;
+            });
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.alerts && data.alerts.length > 0) {
+            setAlert(data.alerts[0]);
+          }
+        })
+        .catch(error => {
+          console.log("Failed to fetch alerts:", error);
+        });
+    } else {
+      console.log("Weather context not available or missing lat/lon");
+    }
+  }, [weatherCoords, BASE_URL, setAlert]);
 
   const openModal = () => setVisible(true);
   const closeModal = () => setVisible(false);
@@ -50,6 +70,42 @@ export default function AlertCard() {
     if (uri) {
       Linking.openURL(uri);
     }
+  };
+
+  const handleDummyAlert = () => {
+    setAlert(dummyAlert.alerts[0]);
+    
+    // Check if user exists before accessing properties
+    if (!user) {
+      console.log("User data not available");
+      return;
+    }
+    
+    const payload = {
+      user_id: user.sub,
+      user_username: user.nickname || user.name || '',
+      user_name: user.name || '',
+      user_email: user.email || '',
+      user_phone: user.phone || "",
+      user_address: user.address || "",
+      user_location: weatherCoords ? `${weatherCoords.latitude} ${weatherCoords.longitude}` : "",
+      user_severe_weather_alert: JSON.stringify(dummyAlert.alerts[0]),
+      expo_push_token: expoPushToken || '',
+    };
+    
+    // Check if we have auth and base URL before making the API call
+    if (!authToken || !BASE_URL) {
+      console.log("Missing authentication token or base URL");
+      return;
+    }
+    
+    pushUser({ payload, BASE_URL, authToken })
+      .then((data) => {
+        console.log("User pushed successfully:", data);
+      })
+      .catch((err) => {
+        console.error("Error pushing user:", err);
+      });
   };
 
   return (
@@ -79,27 +135,7 @@ export default function AlertCard() {
 
       <Button
         mode="contained"
-        onPress={() => {
-          setAlert(dummyAlert.alerts[0])
-          const payload = {
-            user_id: user.sub,
-            user_username: user.nickname || user.name,
-            user_name: user.name,
-            user_email: user.email,
-            user_phone: user.phone || "",
-            user_address: user.address || "",
-            user_location: weatherCoords ? `${weatherCoords.latitude} ${weatherCoords.longitude}` : "",
-            user_severe_weather_alert: JSON.stringify(alert),
-            expo_push_token: expoPushToken,
-          };
-          pushUser({ payload, BASE_URL, authToken })
-            .then((data) => {
-              console.log("User pushed successfully:", data);
-            })
-            .catch((err) => {
-              console.error("Error pushing user:", err);
-            });
-        }}
+        onPress={handleDummyAlert}
         style={{ marginTop: 10 }}
       >
         <Text>Use Dummy Alert</Text>

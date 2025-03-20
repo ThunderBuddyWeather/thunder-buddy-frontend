@@ -15,17 +15,35 @@ const mockWeather = {
   lon: -74.0060
 };
 
+// Mock user object
+const mockUser = {
+  sub: 'user123',
+  nickname: 'testuser',
+  name: 'Test User',
+  email: 'test@example.com'
+};
+
 jest.mock('../app/context/AppContext', () => ({
   useAppContext: jest.fn(() => ({
     weather: mockWeather,
+    weatherCoords: { latitude: 40.7128, longitude: -74.0060 },
+    BASE_URL: 'https://api.example.com',
     alert: null,
-    setAlert: mockSetAlert
+    setAlert: mockSetAlert,
+    user: mockUser,
+    authToken: 'mock-token',
+    expoPushToken: 'mock-expo-token'
   }))
 }));
 
 // Mock react-native's Linking
 jest.mock('react-native/Libraries/Linking/Linking', () => ({
   openURL: jest.fn()
+}));
+
+// Mock queries.js
+jest.mock('../app/queries.js', () => ({
+  pushUser: jest.fn().mockResolvedValue({ success: true })
 }));
 
 // Mock fetch
@@ -97,8 +115,13 @@ describe('AlertCard Component', () => {
     jest.clearAllMocks();
     useAppContext.mockImplementation(() => ({
       weather: mockWeather,
+      weatherCoords: { latitude: 40.7128, longitude: -74.0060 },
+      BASE_URL: 'https://api.example.com',
       alert: null,
-      setAlert: mockSetAlert
+      setAlert: mockSetAlert,
+      user: mockUser,
+      authToken: 'mock-token',
+      expoPushToken: 'mock-expo-token'
     }));
   });
 
@@ -194,8 +217,13 @@ describe('AlertCard Component', () => {
     const mockSetAlert = jest.fn();
     useAppContext.mockReturnValue({
       weather: mockWeather,
+      weatherCoords: { latitude: 40.7128, longitude: -74.0060 },
+      BASE_URL: 'https://api.example.com',
       alert: null,
-      setAlert: mockSetAlert
+      setAlert: mockSetAlert,
+      user: mockUser,
+      authToken: 'mock-token',
+      expoPushToken: 'mock-expo-token'
     });
 
     const { getByText } = render(<AlertCard />);
@@ -212,15 +240,20 @@ describe('AlertCard Component', () => {
   });
 
   it('handles API error correctly', async () => {
-    // Mock the weather context
-    const mockWeather = {
-      lat: 28.5384,
-      lon: -81.3789
+    // Mock the weather context with all required properties
+    const mockWeatherCoords = {
+      latitude: 28.5384, 
+      longitude: -81.3789
     };
     const mockContextValue = {
       weather: mockWeather,
+      weatherCoords: mockWeatherCoords,
+      BASE_URL: 'https://api.example.com',
       alert: null,
-      setAlert: jest.fn()
+      setAlert: jest.fn(),
+      user: mockUser,
+      authToken: 'mock-token',
+      expoPushToken: 'mock-expo-token'
     };
 
     // Mock the fetch to reject with an error
@@ -233,23 +266,16 @@ describe('AlertCard Component', () => {
     console.log = mockLog;
 
     // Render the component with context
-    const renderResult = render(
-      <AppContext.Provider value={mockContextValue}>
-        <AlertCard />
-      </AppContext.Provider>
-    );
+    useAppContext.mockImplementation(() => mockContextValue);
+    render(<AlertCard />);
 
     // Wait for the fetch to be called and error to be logged
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalled();
-      const errorLogCall = mockLog.mock.calls.find(
-        call => call[0] === 'Error fetching alerts:' && call[1] === error
-      );
-      expect(errorLogCall).toBeTruthy();
+      expect(mockLog).toHaveBeenCalledWith("Failed to fetch alerts:", error);
     }, { timeout: 3000 });
 
-    // Cleanup
-    renderResult.unmount();
+    // Restore console.log
     console.log = originalConsoleLog;
   });
 
