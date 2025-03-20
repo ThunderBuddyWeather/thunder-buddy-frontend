@@ -7,18 +7,24 @@
       "developmentClient": true,
       "distribution": "internal",
       "ios": {
-        "resourceClass": "m-medium"
+        "resourceClass": "m-medium",
+        "simulator": false,
+        "credentialsSource": "remote"
       }
     },
     "preview": {
       "distribution": "internal",
       "ios": {
-        "resourceClass": "m-medium"
+        "resourceClass": "m-medium",
+        "simulator": false,
+        "credentialsSource": "remote"
       }
     },
     "production": {
       "ios": {
-        "resourceClass": "m-medium"
+        "resourceClass": "m-medium",
+        "simulator": false,
+        "credentialsSource": "remote"
       }
     }
   },
