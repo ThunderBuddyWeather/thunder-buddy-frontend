@@ -6,6 +6,7 @@ import * as Linking from 'expo-linking';
 import LogIn from './app/components/LogIn';
 import AuthRedirect from './app/components/AuthRedirect';
 import { AppProvider, useAppContext } from './app/context/AppContext.jsx';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import MainTabs from './app/components/MainTabs';
 
 const Stack = createNativeStackNavigator();
@@ -26,6 +27,7 @@ const linking = {
           Home: 'home',
           Alerts: 'alerts',
           Social: 'social',
+          Notifications: 'notifications'
         },
       },
     },
@@ -45,17 +47,22 @@ function RootNavigator() {
         <Stack.Screen name="Main" component={MainTabs} />
       )}
     </Stack.Navigator>
-  );
+   );
 }
+
+
+const queryClient = new QueryClient();
 
 export default function App() {
   return (
     <PaperProvider>
-      <AppProvider>
-        <NavigationContainer linking={linking}>
-          <RootNavigator />
-        </NavigationContainer>
-      </AppProvider>
+      <QueryClientProvider client={queryClient}>
+        <AppProvider>
+          <NavigationContainer linking={linking}>
+            <RootNavigator />
+          </NavigationContainer>
+        </AppProvider>
+    </QueryClientProvider>
     </PaperProvider>
   );
 }

@@ -18,7 +18,6 @@ export default function Alerts() {
   const [visible, setVisible] = useState(false);
   const { weather, alert, setAlert } = useAppContext();
 
-  // Dummy alert with affectedContacts added:
   const dummyAlert = {
     alerts: [
       {
@@ -124,6 +123,7 @@ export default function Alerts() {
                       key={index}
                       source={{ uri: contact.picture }}
                       style={styles.affectedContactImage}
+                      
                     />
                   ) : (
                     <Avatar.Icon

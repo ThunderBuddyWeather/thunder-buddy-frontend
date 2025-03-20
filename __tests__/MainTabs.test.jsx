@@ -27,6 +27,7 @@ jest.mock('@expo/vector-icons', () => ({
 jest.mock('../app/components/Home', () => () => 'Home');
 jest.mock('../app/components/Social', () => () => 'Social');
 jest.mock('../app/components/Alerts', () => () => 'Alerts');
+jest.mock('../app/components/Notifications', () => () => 'Notifications');
 
 describe('MainTabs Component', () => {
   const renderWithNavigation = (component) => {
@@ -37,14 +38,15 @@ describe('MainTabs Component', () => {
     );
   };
 
-  test('renders Home, Alerts, and Social tabs', () => {
+  test('renders Home, Alerts, Notifications, and Social tabs', () => {
     const { UNSAFE_root: root } = renderWithNavigation(<MainTabs />);
     const screens = root.findAllByType('mock-screen');
 
-    expect(screens).toHaveLength(3);
+    expect(screens).toHaveLength(4);
     expect(screens[0].props.name).toBe('Home');
     expect(screens[1].props.name).toBe('Alerts');
-    expect(screens[2].props.name).toBe('Social');
+    expect(screens[2].props.name).toBe('Notifications');
+    expect(screens[3].props.name).toBe('Social');
   });
 
   test('configures tab screens with correct options', () => {
@@ -103,6 +105,11 @@ describe('MainTabs Component', () => {
     const socialIcon = screenOptions({ route: { name: 'Social' } })
       .tabBarIcon({ color: 'black', size: 24 });
     expect(socialIcon.props.name).toBe('people');
+    
+    // Test Alerts tab icon
+    const alertsIcon = screenOptions({ route: { name: 'Alerts' } })
+      .tabBarIcon({ color: 'black', size: 24 });
+    expect(alertsIcon.props.name).toBe('alert-circle-outline');
   });
 
   test('handles unknown route names gracefully', () => {

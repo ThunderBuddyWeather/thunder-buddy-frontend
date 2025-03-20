@@ -1,399 +1,201 @@
 import React from 'react';
-import { render, fireEvent, act } from '@testing-library/react-native';
-import ContactSearch from '../app/components/ContactSearch';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { jest, describe, beforeEach, afterEach, test, expect } from '@jest/globals';
+import ContactSearch from '../app/components/ContactSearch';
 
-// Mock react-native-paper components
-jest.mock('react-native-paper', () => {
-  const React = require('react');
-  const { View } = require('react-native');
+// Mock the AppContext
+jest.mock('../app/context/AppContext', () => ({
+  useAppContext: jest.fn()
+}));
 
-  const MockCard = ({ children, style }) => (
-    <View style={style} testID="card">
-      {children}
-    </View>
-  );
-  MockCard.displayName = 'Card';
+// Mock fetch
+global.fetch = jest.fn();
 
-  MockCard.Content = ({ children, style }) => (
-    <View style={style} testID="card-content">
-      {children}
-    </View>
-  );
-  MockCard.Content.displayName = 'Card.Content';
+// Mock components
+jest.mock('react-native-paper', () => ({
+  Card: 'MockCard',
+  Avatar: {
+    Image: 'MockAvatarImage',
+    Icon: 'MockAvatarIcon'
+  }
+}));
 
-  const MockAvatar = ({ children }) => (
-    <View testID="avatar">
-      {children}
-    </View>
-  );
-  MockAvatar.displayName = 'Avatar';
-
-  MockAvatar.Image = ({ source, size }) => (
-    <View testID="avatar-image" source={source} size={size} />
-  );
-  MockAvatar.Image.displayName = 'Avatar.Image';
-
-  MockAvatar.Icon = ({ icon, size }) => (
-    <View testID="avatar-icon" icon={icon} size={size} />
-  );
-  MockAvatar.Icon.displayName = 'Avatar.Icon';
-
-  return {
-    Card: MockCard,
-    Avatar: MockAvatar
-  };
-});
-
-// Sample test data
-const mockContacts = [
-  { userId: '1', username: 'alice', picture: 'https://example.com/alice.jpg' },
-  { userId: '2', username: 'bob', picture: null },
-  { userId: '3', username: 'charlie', picture: 'https://example.com/charlie.jpg' }
-];
-
-const mockMyContacts = [
-  { userId: '3', username: 'charlie' } // Already a contact
-];
+// Default mocked context values
+const mockContextValue = {
+  user: {
+    id: 'test-user-id',
+    name: 'Test User',
+    email: 'test@example.com',
+    sub: 'auth0|12345',
+    nickname: 'testuser'
+  },
+  BASE_URL: 'https://api.example.com'
+};
 
 describe('ContactSearch Component', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    jest.clearAllMocks();
+    // Set up the default mock implementation for useAppContext
+    require('../app/context/AppContext').useAppContext.mockReturnValue(mockContextValue);
+    
+    // Set up the default fetch success response
+    global.fetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ message: 'Friend request sent!' })
+    });
   });
 
   afterEach(() => {
-    jest.useRealTimers();
     jest.clearAllMocks();
   });
 
-  // Basic rendering tests
-  describe('Rendering', () => {
-    test('renders the search input correctly', () => {
-      const { getByPlaceholderText } = render(
-        <ContactSearch contacts={[]} myContacts={[]} />
-      );
-      
-      expect(getByPlaceholderText('Enter username...')).toBeTruthy();
-    });
-    
-    test('initially does not show any contacts', () => {
-      const { queryByText } = render(
-        <ContactSearch contacts={mockContacts} myContacts={[]} />
-      );
-      
-      expect(queryByText('alice')).toBeNull();
-      expect(queryByText('bob')).toBeNull();
-      expect(queryByText('charlie')).toBeNull();
-    });
+  test('renders without crashing', () => {
+    const { getByPlaceholderText } = render(<ContactSearch />);
+    expect(getByPlaceholderText('Username')).toBeTruthy();
   });
 
-  // Search functionality tests
-  describe('Search Functionality', () => {
-    test('updates search query when typing', () => {
-      const { getByPlaceholderText } = render(
-        <ContactSearch contacts={mockContacts} myContacts={[]} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      fireEvent.changeText(searchInput, 'ali');
-      
-      expect(searchInput.props.value).toBe('ali');
-    });
+  test('handles input changes', () => {
+    const { getByPlaceholderText } = render(<ContactSearch />);
     
-    test('filters contacts based on search query', () => {
-      const { getByPlaceholderText, getByText, queryByText } = render(
-        <ContactSearch contacts={mockContacts} myContacts={[]} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      fireEvent.changeText(searchInput, 'ali');
-      
-      // Should find 'alice' but not 'bob' or 'charlie'
-      expect(getByText('alice')).toBeTruthy();
-      expect(queryByText('bob')).toBeNull();
-      expect(queryByText('charlie')).toBeNull();
-    });
+    const input = getByPlaceholderText('Username');
+    fireEvent.changeText(input, 'test');
     
-    test('handles case insensitive search', () => {
-      const { getByPlaceholderText, getByText } = render(
-        <ContactSearch contacts={mockContacts} myContacts={[]} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      fireEvent.changeText(searchInput, 'ALI');
-      
-      // Should still find 'alice' despite different case
-      expect(getByText('alice')).toBeTruthy();
-    });
-    
-    test('excludes contacts already in myContacts', () => {
-      const { getByPlaceholderText, queryByText } = render(
-        <ContactSearch contacts={mockContacts} myContacts={mockMyContacts} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      fireEvent.changeText(searchInput, 'char');
-      
-      // Should not find 'charlie' as it's already in myContacts
-      expect(queryByText('charlie')).toBeNull();
-    });
-    
-    test('shows "No contacts found" when search has no results', () => {
-      const { getByPlaceholderText, getByText } = render(
-        <ContactSearch contacts={mockContacts} myContacts={[]} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      fireEvent.changeText(searchInput, 'nonexistent');
-      
-      expect(getByText('No contacts found')).toBeTruthy();
-    });
-    
-    test('does not show contacts when search query is empty', () => {
-      const { getByPlaceholderText, queryByText } = render(
-        <ContactSearch contacts={mockContacts} myContacts={[]} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      
-      // Type something and then delete it
-      fireEvent.changeText(searchInput, 'a');
-      expect(queryByText('alice')).toBeTruthy();
-      
-      fireEvent.changeText(searchInput, '');
-      
-      expect(queryByText('alice')).toBeNull();
-    });
-    
-    test('handles whitespace in search query', () => {
-      const { getByPlaceholderText, queryByText } = render(
-        <ContactSearch contacts={mockContacts} myContacts={[]} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      
-      // Search with whitespace only
-      fireEvent.changeText(searchInput, '   ');
-      
-      expect(queryByText('alice')).toBeNull();
-      expect(queryByText('bob')).toBeNull();
-    });
+    expect(input.props.value).toBe('test');
   });
 
-  // Friend Request functionality tests
-  describe('Friend Request Functionality', () => {
-    test('sends friend request when button is pressed', async () => {
-      const mockOnSendFriendRequest = jest.fn();
-      
-      const { getByPlaceholderText, getByText } = render(
-        <ContactSearch 
-          contacts={mockContacts} 
-          myContacts={[]} 
-          onSendFriendRequest={mockOnSendFriendRequest} 
-        />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      fireEvent.changeText(searchInput, 'alice');
-      
-      const addButton = getByText('+').parent;
-      fireEvent.press(addButton);
-      
-      await act(async () => {
-        jest.advanceTimersByTime(1500);
-      });
-      
-      expect(mockOnSendFriendRequest).toHaveBeenCalledWith('1');
-      expect(mockOnSendFriendRequest).toHaveBeenCalledTimes(1);
-    });
+  test('submits friend request when input is submitted', async () => {
+    const { getByPlaceholderText } = render(<ContactSearch />);
     
-    test('friend request button changes to checkmark after successful request', async () => {
-      const { getByPlaceholderText, queryByText, getAllByTestId } = render(
-        <ContactSearch contacts={mockContacts} myContacts={[]} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      await act(async () => {
-        fireEvent.changeText(searchInput, 'alice');
-      });
-      
-      // Find and press the button
-      const addButton = getAllByTestId('friend-button')[0];
-      await act(async () => {
-        fireEvent.press(addButton);
-        jest.advanceTimersByTime(1500);
-      });
-      
-      // Should now show "✓" instead of "+"
-      expect(queryByText('+')).toBeNull();
-      const checkmarks = getAllByTestId('friend-button-text');
-      expect(checkmarks[0].children[0]).toBe('✓');
-    });
+    const input = getByPlaceholderText('Username');
+    fireEvent.changeText(input, 'friendname');
+    fireEvent(input, 'submitEditing');
     
-    test('friend request button is disabled during request', async () => {
-      const { getByPlaceholderText, getAllByTestId } = render(
-        <ContactSearch contacts={mockContacts} myContacts={[]} />
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://api.example.com/api/friendship/request/testuser+friendname',
+        { method: 'POST' }
       );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      await act(async () => {
-        fireEvent.changeText(searchInput, 'alice');
-      });
-      
-      // Find and press the button
-      const addButton = getAllByTestId('friend-button')[0];
-      await act(async () => {
-        fireEvent.press(addButton);
-      });
-      
-      expect(addButton.props.accessibilityState.disabled).toBe(true);
-    });
-    
-    test('friend request button remains disabled after successful request', async () => {
-      const { getByPlaceholderText, getAllByTestId } = render(
-        <ContactSearch contacts={mockContacts} myContacts={[]} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      await act(async () => {
-        fireEvent.changeText(searchInput, 'alice');
-      });
-      
-      // Find and press the button
-      const addButton = getAllByTestId('friend-button')[0];
-      await act(async () => {
-        fireEvent.press(addButton);
-        jest.advanceTimersByTime(1500);
-      });
-      
-      expect(addButton.props.accessibilityState.disabled).toBe(true);
-    });
-    
-    test('handles case when onSendFriendRequest is not provided', async () => {
-      const { getByPlaceholderText, getAllByText } = render(
-        <ContactSearch contacts={mockContacts} myContacts={[]} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      fireEvent.changeText(searchInput, 'alice');
-      
-      // Find and press the button
-      const addButton = getAllByText('+')[0].parent;
-      
-      // Should not throw when pressing the button without onSendFriendRequest prop
-      expect(() => {
-        fireEvent.press(addButton);
-        act(() => {
-          jest.advanceTimersByTime(1500);
-        });
-      }).not.toThrow();
-    });
-    
-    test('handles error during friend request and resets after timeout', async () => {
-      const mockOnSendFriendRequest = jest.fn(() => Promise.reject(new Error('Request failed')));
-      
-      const { getByPlaceholderText, getAllByTestId } = render(
-        <ContactSearch 
-          contacts={mockContacts} 
-          myContacts={[]} 
-          onSendFriendRequest={mockOnSendFriendRequest}
-        />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      await act(async () => {
-        fireEvent.changeText(searchInput, 'alice');
-      });
-      
-      // Find and press the button
-      const addButton = getAllByTestId('friend-button')[0];
-      await act(async () => {
-        fireEvent.press(addButton);
-      });
-      
-      // Button should be disabled during the error state
-      expect(addButton.props.accessibilityState.disabled).toBe(true);
-      
-      // Fast-forward the error timeout
-      await act(async () => {
-        jest.advanceTimersByTime(1500);
-      });
-      
-      // Button should be enabled again after error timeout
-      expect(addButton.props.accessibilityState.disabled).toBe(false);
     });
   });
-
-  // Avatar rendering tests
-  describe('Avatar Rendering', () => {
-    test('renders Avatar.Image when contact has a picture', () => {
-      const { getByPlaceholderText, getByTestId } = render(
-        <ContactSearch contacts={mockContacts} myContacts={[]} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      fireEvent.changeText(searchInput, 'ali');
-      
-      const avatarImage = getByTestId('avatar-image');
-      expect(avatarImage.props.source.uri).toBe('https://example.com/alice.jpg');
-      expect(avatarImage.props.size).toBe(48);
-    });
+  
+  test('does not submit when friend code is empty', async () => {
+    const { getByPlaceholderText } = render(<ContactSearch />);
     
-    test('renders Avatar.Icon when contact has no picture', () => {
-      const { getByPlaceholderText, getByTestId } = render(
-        <ContactSearch contacts={mockContacts} myContacts={[]} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      fireEvent.changeText(searchInput, 'bob');
-      
-      const avatarIcon = getByTestId('avatar-icon');
-      expect(avatarIcon.props.icon).toBe('account');
-      expect(avatarIcon.props.size).toBe(48);
-    });
+    const input = getByPlaceholderText('Username');
+    fireEvent.changeText(input, '   '); // Only whitespace
+    fireEvent(input, 'submitEditing');
+    
+    // The fetch should not be called
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 
-  // Edge case tests
-  describe('Edge Cases', () => {
-    test('handles empty contacts array', () => {
-      const { getByPlaceholderText, getByText } = render(
-        <ContactSearch contacts={[]} myContacts={[]} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      fireEvent.changeText(searchInput, 'test');
-      
-      expect(getByText('No contacts found')).toBeTruthy();
+  test('shows error when user is not logged in', async () => {
+    // Mock the context to return no user
+    require('../app/context/AppContext').useAppContext.mockReturnValue({
+      ...mockContextValue,
+      user: null
     });
     
-    test('handles undefined myContacts prop', () => {
-      const { getByPlaceholderText, getByText } = render(
-        <ContactSearch contacts={mockContacts} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      fireEvent.changeText(searchInput, 'alice');
-      
-      // Should still find alice
-      expect(getByText('alice')).toBeTruthy();
+    const { getByPlaceholderText, findByText } = render(<ContactSearch />);
+    
+    const input = getByPlaceholderText('Username');
+    fireEvent.changeText(input, 'friendname');
+    fireEvent(input, 'submitEditing');
+    
+    const errorMessage = await findByText('No logged-in user found.');
+    expect(errorMessage).toBeTruthy();
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  test('shows success message on successful request', async () => {
+    const { getByPlaceholderText, findByText } = render(<ContactSearch />);
+    
+    const input = getByPlaceholderText('Username');
+    fireEvent.changeText(input, 'friendname');
+    fireEvent(input, 'submitEditing');
+    
+    const successMessage = await findByText('Friend request sent!');
+    expect(successMessage).toBeTruthy();
+  });
+
+  test('shows success checkmark on successful request', async () => {
+    const { getByPlaceholderText, findByText } = render(<ContactSearch />);
+    
+    const input = getByPlaceholderText('Username');
+    fireEvent.changeText(input, 'friendname');
+    fireEvent(input, 'submitEditing');
+    
+    // Find the checkmark
+    const checkmark = await findByText('✓');
+    expect(checkmark).toBeTruthy();
+  });
+
+  test('shows error message when API request fails', async () => {
+    // Mock a failed API response
+    global.fetch.mockResolvedValue({
+      ok: false,
+      json: () => Promise.resolve({ message: 'User not found' })
     });
     
-    test('handles multiple search results correctly', () => {
-      const multipleContacts = [
-        ...mockContacts,
-        { userId: '4', username: 'alicia', picture: null }
-      ];
-      
-      const { getByPlaceholderText, getByText } = render(
-        <ContactSearch contacts={multipleContacts} myContacts={[]} />
-      );
-      
-      const searchInput = getByPlaceholderText('Enter username...');
-      fireEvent.changeText(searchInput, 'ali');
-      
-      // Should find both 'alice' and 'alicia'
-      expect(getByText('alice')).toBeTruthy();
-      expect(getByText('alicia')).toBeTruthy();
+    const { getByPlaceholderText, findByText } = render(<ContactSearch />);
+    
+    const input = getByPlaceholderText('Username');
+    fireEvent.changeText(input, 'nonexistentuser');
+    fireEvent(input, 'submitEditing');
+    
+    const errorMessage = await findByText('User not found');
+    expect(errorMessage).toBeTruthy();
+    expect(errorMessage.props.style).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ color: 'red' })
+      ])
+    );
+  });
+
+  test('handles API network errors', async () => {
+    // Mock a network error
+    global.fetch.mockRejectedValue(new Error('Network error'));
+    
+    const { getByPlaceholderText, findByText } = render(<ContactSearch />);
+    
+    const input = getByPlaceholderText('Username');
+    fireEvent.changeText(input, 'friendname');
+    fireEvent(input, 'submitEditing');
+    
+    const errorMessage = await findByText('Network error');
+    expect(errorMessage).toBeTruthy();
+  });
+
+  test('handles API errors with no specific message', async () => {
+    // Mock a failed API response with no message
+    global.fetch.mockResolvedValue({
+      ok: false,
+      json: () => Promise.resolve({})
     });
+    
+    const { getByPlaceholderText, findByText } = render(<ContactSearch />);
+    
+    const input = getByPlaceholderText('Username');
+    fireEvent.changeText(input, 'friendname');
+    fireEvent(input, 'submitEditing');
+    
+    const errorMessage = await findByText('Failed to send friend request');
+    expect(errorMessage).toBeTruthy();
+  });
+
+  test('handles network errors with no specific message', async () => {
+    // Mock a network error with no message
+    const error = new Error();
+    error.message = undefined;
+    global.fetch.mockRejectedValue(error);
+    
+    const { getByPlaceholderText, findByText } = render(<ContactSearch />);
+    
+    const input = getByPlaceholderText('Username');
+    fireEvent.changeText(input, 'friendname');
+    fireEvent(input, 'submitEditing');
+    
+    const errorMessage = await findByText('Something went wrong');
+    expect(errorMessage).toBeTruthy();
   });
 });

@@ -46,6 +46,7 @@ jest.mock('../app/context/AppContext', () => ({
 describe('AuthRedirect Component', () => {
   const mockUserData = { email: 'test@example.com', sub: 'test_sub' };
   let mockSetUser;
+  let mockSetAuthToken;
   let mockUser;
   let originalWindow;
   let originalConsoleError;
@@ -56,10 +57,12 @@ describe('AuthRedirect Component', () => {
     originalConsoleError = console.error;
     console.error = jest.fn();
 
+    mockUser = null;
     mockSetUser = jest.fn((newUser) => {
       mockUser = newUser;
     });
-    mockUser = null;
+    mockSetAuthToken = jest.fn();
+    
     mockRouteParams = {
       code: 'test_code',
       codeVerifier: 'test_verifier'
@@ -84,9 +87,12 @@ describe('AuthRedirect Component', () => {
         json: () => Promise.resolve({ id_token: 'test_token' })
       })
     );
+    
+    // Mock useAppContext with all required values
     useAppContext.mockImplementation(() => ({
       user: mockUser,
-      setUser: mockSetUser
+      setUser: mockSetUser,
+      setAuthToken: mockSetAuthToken
     }));
   });
 
@@ -100,22 +106,36 @@ describe('AuthRedirect Component', () => {
   it('handles mobile auth code from route params', async () => {
     render(<AuthRedirect />);
 
+    // Allow all promises and effects to resolve
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    
+    // Force a second render cycle to handle authAttempted change
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
 
     expect(mockSetUser).toHaveBeenCalledWith(mockUserData);
+    expect(mockSetAuthToken).toHaveBeenCalledWith('test_token');
     expect(mockNavigate).toHaveBeenCalledWith('Home');
   });
 
   it('handles web auth code from URL', async () => {
     render(<AuthRedirect />);
 
+    // Allow all promises and effects to resolve
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    
+    // Force a second render cycle to handle authAttempted change
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
 
     expect(mockSetUser).toHaveBeenCalledWith(mockUserData);
+    expect(mockSetAuthToken).toHaveBeenCalledWith('test_token');
     expect(mockNavigate).toHaveBeenCalledWith('Home');
   });
 
@@ -129,6 +149,12 @@ describe('AuthRedirect Component', () => {
 
     render(<AuthRedirect />);
 
+    // Allow all promises and effects to resolve
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    
+    // Force a second render cycle to handle authAttempted change
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
@@ -147,6 +173,12 @@ describe('AuthRedirect Component', () => {
 
     render(<AuthRedirect />);
 
+    // Allow all promises and effects to resolve
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    
+    // Force a second render cycle to handle authAttempted change
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
@@ -162,6 +194,12 @@ describe('AuthRedirect Component', () => {
 
     render(<AuthRedirect />);
 
+    // Allow all promises and effects to resolve
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    
+    // Force a second render cycle to handle authAttempted change
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
@@ -175,14 +213,22 @@ describe('AuthRedirect Component', () => {
   });
 
   it('navigates to Home when user is already set', async () => {
+    // Set the mockUser before rendering
     mockUser = mockUserData;
     useAppContext.mockImplementation(() => ({
       user: mockUser,
-      setUser: mockSetUser
+      setUser: mockSetUser,
+      setAuthToken: mockSetAuthToken
     }));
 
     render(<AuthRedirect />);
 
+    // Allow all promises and effects to resolve
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    
+    // Force a second render cycle to handle authAttempted change
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });

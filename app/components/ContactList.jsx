@@ -1,12 +1,19 @@
 import React from 'react';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
 import { Avatar, Card } from 'react-native-paper';
+import { useFriends } from '../queries';
+import { useAppContext } from '../context/AppContext';
 
-export default function ContactList({ contacts }) {
+export default function ContactList() {
+  const { user, BASE_URL } = useAppContext();
+  const currentUsername = user ? (user.nickname || user.name) : null;
+  const { data: friends, isLoading, error } = useFriends(currentUsername, BASE_URL);
+
+  if (isLoading) return <Text>Loading contacts...</Text>;
+  if (error) return <Text>Error loading contacts: {error.message}</Text>;
+
   const ContactCard = ({ contact }) => {
-    const { name, weatherIcon, alert, picture } = contact;
-    const weatherIconUrl = `https://www.weatherbit.io/static/img/icons/${weatherIcon}.png`;
-
+    const { name, picture } = contact;
     return (
       <Card style={styles.card}>
         <Card.Content style={styles.cardContent}>
@@ -20,19 +27,6 @@ export default function ContactList({ contacts }) {
             <Avatar.Icon size={48} icon="account" style={styles.profileIcon} />
           )}
           <Text style={styles.nameText}>{name}</Text>
-          <Image
-            source={{ uri: weatherIconUrl }}
-            resizeMode="contain"
-            style={styles.weatherImage}
-          />
-          {alert && (
-            <Avatar.Icon
-              size={32}
-              icon="alert-circle"
-              color="white"
-              style={styles.alertIcon}
-            />
-          )}
         </Card.Content>
       </Card>
     );
@@ -42,8 +36,8 @@ export default function ContactList({ contacts }) {
     <View style={styles.container}>
       <Text style={styles.title}>Contacts</Text>
       <ScrollView style={styles.scrollContainer}>
-        {contacts.map((contact) => (
-          <ContactCard key={contact.userId} contact={contact} />
+        {friends.map((contact) => (
+          <ContactCard key={contact.user_id} contact={contact} />
         ))}
       </ScrollView>
     </View>
@@ -51,32 +45,29 @@ export default function ContactList({ contacts }) {
 }
 
 const styles = StyleSheet.create({
-  alertIcon: {
-    backgroundColor: 'red',
-    marginLeft: 16,
-  },
   card: {
     backgroundColor: 'white',
     borderColor: '#D1D5DB',
     borderRadius: 12,
     borderWidth: 1,
-    margin: 16,
+    marginVertical: 8,
+    maxWidth: 400,
+    alignSelf: 'center',
   },
   cardContent: {
     alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    padding: 8,
   },
   container: {
     flex: 1,
+    padding: 16,
   },
   nameText: {
     fontSize: 16,
     marginLeft: 16,
   },
-  profileIcon: {
-    // No additional styling needed; Paper's Avatar.Icon is circular by default.
-  },
+  profileIcon: {},
   profileImage: {
     borderRadius: 24,
     height: 48,
@@ -84,16 +75,11 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
+    marginTop: 16,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 16,
     textAlign: 'center',
-  },
-  weatherImage: {
-    height: 48,
-    marginLeft: 16,
-    width: 48,
   },
 });
