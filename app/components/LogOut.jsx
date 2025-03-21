@@ -3,8 +3,10 @@ import { Button } from 'react-native-paper';
 import { Text, View, Platform, TouchableOpacity } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { useAppContext } from '../context/AppContext.jsx';
-import { authDomain, clientId } from '../../auth0-config';
 import styles from '../stylesheets/styles.js';
+
+const AUTH_DOMAIN = process.env.AUTH_DOMAIN;
+const CLIENT_ID = process.env.CLIENT_ID;
 
 export default function LogOut() {
   const { setUser } = useAppContext();
@@ -16,7 +18,7 @@ export default function LogOut() {
       ? encodeURIComponent(window.location.origin)
       : encodeURIComponent('myapp://auth'); 
 
-    const logoutUrl = `https://${authDomain}/v2/logout?client_id=${clientId}&returnTo=${returnTo}`;
+    const logoutUrl = `https://${AUTH_DOMAIN}/v2/logout?client_id=${CLIENT_ID}&returnTo=${returnTo}`;
 
     try {
       if (Platform.OS === 'web') {

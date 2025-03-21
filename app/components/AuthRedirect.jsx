@@ -4,7 +4,9 @@ import { Platform } from 'react-native';
 import * as AuthSession from 'expo-auth-session';
 import jwt_decode from 'jwt-decode';
 import { useAppContext } from '../context/AppContext.jsx';
-import { authDomain, clientId } from '../../auth0-config';
+
+const AUTH_DOMAIN = process.env.AUTH_DOMAIN;
+const CLIENT_ID = process.env.CLIENT_ID;
 
 export default function AuthRedirect() {
   const navigation = useNavigation();
@@ -36,12 +38,12 @@ export default function AuthRedirect() {
             useProxy: Platform.OS !== 'web',
           });
   
-          const tokenResponse = await fetch(`https://${authDomain}/oauth/token`, {
+          const tokenResponse = await fetch(`https://${AUTH_DOMAIN}/oauth/token`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               grant_type: 'authorization_code',
-              client_id: clientId,
+              client_id: CLIENT_ID,
               code,
               redirect_uri: redirectUri,
               code_verifier: codeVerifier,

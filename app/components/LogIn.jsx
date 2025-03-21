@@ -4,10 +4,12 @@ import { Button } from 'react-native-paper';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { useNavigation } from '@react-navigation/native';
-import { authDomain, clientId } from '../../auth0-config';
 import styles from '../stylesheets/styles.js';
 
 WebBrowser.maybeCompleteAuthSession();
+
+const AUTH_DOMAIN = process.env.AUTH_DOMAIN;
+const CLIENT_ID = process.env.CLIENT_ID;
 
 export default function LogIn() {
   const navigation = useNavigation();
@@ -25,17 +27,17 @@ export default function LogIn() {
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
-      clientId,
+      CLIENT_ID,
       scopes: ['openid', 'profile', 'email'],
       redirectUri,
       responseType: AuthSession.ResponseType.Code,
       extraParams: {
-        audience: `https://${authDomain}/api/v2/`
+        audience: `https://${AUTH_DOMAIN}/api/v2/`
       },
     },
     {
-      authorizationEndpoint: `https://${authDomain}/authorize`,
-      tokenEndpoint: `https://${authDomain}/oauth/token`,
+      authorizationEndpoint: `https://${AUTH_DOMAIN}/authorize`,
+      tokenEndpoint: `https://${AUTH_DOMAIN}/oauth/token`,
     }
   );
 
@@ -62,13 +64,13 @@ export default function LogIn() {
 
     if (Platform.OS === 'web') {
       const params = new URLSearchParams({
-        client_id: clientId,
+        client_id: CLIENT_ID,
         scope: 'openid profile email',
         response_type: 'code',
         redirect_uri: redirectUri,
-        audience: `https://${authDomain}/api/v2/`
+        audience: `https://${AUTH_DOMAIN}/api/v2/`
       });
-      const authUrl = `https://${authDomain}/authorize?${params.toString()}`;
+      const authUrl = `https://${AUTH_DOMAIN}/authorize?${params.toString()}`;
       console.log("Web auth URL:", authUrl);
       window.location.href = authUrl;
     } else {
