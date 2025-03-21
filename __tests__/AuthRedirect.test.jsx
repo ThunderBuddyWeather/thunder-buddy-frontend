@@ -5,6 +5,12 @@ import AuthRedirect from '../app/components/AuthRedirect';
 import { useAppContext } from '../app/context/AppContext';
 import jwt_decode from 'jwt-decode';
 
+// Mock auth0-config
+jest.mock('../auth0-config', () => ({
+  AUTH_DOMAIN: 'test.auth0.com',
+  CLIENT_ID: 'test-client-id'
+}));
+
 // Mock Platform
 jest.mock('react-native', () => ({
   Platform: {

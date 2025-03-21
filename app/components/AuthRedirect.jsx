@@ -4,9 +4,7 @@ import { Platform } from 'react-native';
 import * as AuthSession from 'expo-auth-session';
 import jwt_decode from 'jwt-decode';
 import { useAppContext } from '../context/AppContext.jsx';
-
-const AUTH_DOMAIN = process.env.AUTH_DOMAIN;
-const CLIENT_ID = process.env.CLIENT_ID;
+import { AUTH_DOMAIN, CLIENT_ID } from '../../auth0-config';
 
 export default function AuthRedirect() {
   const navigation = useNavigation();
