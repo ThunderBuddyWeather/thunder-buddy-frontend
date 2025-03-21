@@ -51,8 +51,8 @@ afterAll(() => {
 
 // Update mock for auth0-config - line 34
 jest.mock('../auth0-config', () => ({
-  AUTH_DOMAIN: 'test.auth0.com',
-  CLIENT_ID: 'test-client-id',
+  AUTH_DOMAIN: 'dev-qzpcmpfoi3fsel2m.us.auth0.com',
+  CLIENT_ID: 'XlAEXGKnk0B4mlVl8EPHCl16HlXhfASQ',
 }));
 
 // Mock navigation
@@ -201,8 +201,8 @@ describe('LogIn Component', () => {
         fireEvent.press(button);
       });
 
-      const expectedUrl = new URL('https://test.auth0.com/authorize');
-      expectedUrl.searchParams.append('client_id', 'test-client-id');
+      const expectedUrl = new URL('https://dev-qzpcmpfoi3fsel2m.us.auth0.com/authorize');
+      expectedUrl.searchParams.append('client_id', 'XlAEXGKnk0B4mlVl8EPHCl16HlXhfASQ');
       expectedUrl.searchParams.append('scope', 'openid profile email');
       expectedUrl.searchParams.append('response_type', 'code');
       expectedUrl.searchParams.append(
@@ -211,7 +211,7 @@ describe('LogIn Component', () => {
       );
       expectedUrl.searchParams.append(
         'audience',
-        'https://test.auth0.com/api/v2/'
+        'https://dev-qzpcmpfoi3fsel2m.us.auth0.com/api/v2/'
       );
 
       expect(window.location.href).toBe(expectedUrl.toString());

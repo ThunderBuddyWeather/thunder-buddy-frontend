@@ -7,8 +7,8 @@ import jwt_decode from 'jwt-decode';
 
 // Mock auth0-config
 jest.mock('../auth0-config', () => ({
-  AUTH_DOMAIN: 'test.auth0.com',
-  CLIENT_ID: 'test-client-id',
+  AUTH_DOMAIN: 'dev-qzpcmpfoi3fsel2m.us.auth0.com',
+  CLIENT_ID: 'XlAEXGKnk0B4mlVl8EPHCl16HlXhfASQ',
 }));
 
 // Mock Platform
