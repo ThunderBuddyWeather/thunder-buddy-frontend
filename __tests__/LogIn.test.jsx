@@ -36,10 +36,13 @@ afterAll(() => {
   console.log.mockRestore();
 });
 
-// Mock auth config first to avoid import issues
+// Update mock for auth0-config - line 34
 jest.mock('../auth0-config', () => ({
-  clientId: 'test-client-id',
-  authDomain: 'test.auth0.com'
+  AUTH_DOMAIN: 'test.auth0.com',
+  CLIENT_ID: 'test-client-id',
+  // Keep the lowercase versions for backward compatibility
+  authDomain: 'test.auth0.com',
+  clientId: 'test-client-id'
 }));
 
 // Mock navigation

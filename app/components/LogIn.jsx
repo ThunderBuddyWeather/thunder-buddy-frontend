@@ -5,11 +5,9 @@ import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { useNavigation } from '@react-navigation/native';
 import styles from '../stylesheets/styles.js';
+import { AUTH_DOMAIN, CLIENT_ID } from '../../auth0-config';
 
 WebBrowser.maybeCompleteAuthSession();
-
-const AUTH_DOMAIN = process.env.AUTH_DOMAIN;
-const CLIENT_ID = process.env.CLIENT_ID;
 
 export default function LogIn() {
   const navigation = useNavigation();

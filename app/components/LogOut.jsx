@@ -4,9 +4,7 @@ import { Text, View, Platform, TouchableOpacity } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { useAppContext } from '../context/AppContext.jsx';
 import styles from '../stylesheets/styles.js';
-
-const AUTH_DOMAIN = process.env.AUTH_DOMAIN;
-const CLIENT_ID = process.env.CLIENT_ID;
+import { AUTH_DOMAIN, CLIENT_ID } from '../../auth0-config';
 
 export default function LogOut() {
   const { setUser } = useAppContext();
