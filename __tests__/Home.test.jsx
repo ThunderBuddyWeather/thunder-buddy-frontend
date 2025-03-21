@@ -9,25 +9,25 @@ import Home from '../app/components/Home';
 
 // Mock StyleSheet.flatten
 if (typeof StyleSheet.flatten !== 'function') {
-  StyleSheet.flatten = (style) => style;
+  StyleSheet.flatten = style => style;
 }
 
 // Mock expo-web-browser
 jest.mock('expo-web-browser', () => ({
   maybeCompleteAuthSession: jest.fn(),
-  openAuthSessionAsync: jest.fn()
+  openAuthSessionAsync: jest.fn(),
 }));
 
 // Mock expo-auth-session
 jest.mock('expo-auth-session', () => ({
   makeRedirectUri: jest.fn(() => 'https://test.redirect.uri'),
   useAuthRequest: jest.fn(() => [null, null, jest.fn()]),
-  ResponseType: { Code: 'code' }
+  ResponseType: { Code: 'code' },
 }));
 
 // Mock react-native-paper
 jest.mock('react-native-paper', () => {
-  const mockComponent = (name) => {
+  const mockComponent = name => {
     const component = jest.fn().mockImplementation(({ children, testID }) => {
       const { View } = require('react-native');
       return <View testID={testID}>{children}</View>;
@@ -40,14 +40,16 @@ jest.mock('react-native-paper', () => {
   Card.Content = mockComponent('Card.Content');
   Card.Title = mockComponent('Card.Title');
 
-  const Button = jest.fn().mockImplementation(({ children, onPress, testID }) => {
-    const { View, Text } = require('react-native');
-    return (
-      <View testID={testID} onPress={onPress}>
-        {typeof children === 'string' ? <Text>{children}</Text> : children}
-      </View>
-    );
-  });
+  const Button = jest
+    .fn()
+    .mockImplementation(({ children, onPress, testID }) => {
+      const { View, Text } = require('react-native');
+      return (
+        <View testID={testID} onPress={onPress}>
+          {typeof children === 'string' ? <Text>{children}</Text> : children}
+        </View>
+      );
+    });
 
   return {
     Button,
@@ -57,14 +59,14 @@ jest.mock('react-native-paper', () => {
     Modal: mockComponent('Modal'),
     Divider: mockComponent('Divider'),
     Avatar: {
-      Icon: mockComponent('Avatar.Icon')
-    }
+      Icon: mockComponent('Avatar.Icon'),
+    },
   };
 });
 
 // Mock the AppContext
 jest.mock('../app/context/AppContext', () => ({
-  useAppContext: jest.fn()
+  useAppContext: jest.fn(),
 }));
 
 // Mock child components
@@ -77,7 +79,7 @@ jest.mock('../app/components/WeatherCard', () => ({
         <Text>Weather Card</Text>
       </View>
     );
-  })
+  }),
 }));
 
 jest.mock('../app/components/AlertCard', () => ({
@@ -89,7 +91,7 @@ jest.mock('../app/components/AlertCard', () => ({
         <Text>Alert Card</Text>
       </View>
     );
-  })
+  }),
 }));
 
 jest.mock('../app/components/LogOut', () => ({
@@ -101,21 +103,25 @@ jest.mock('../app/components/LogOut', () => ({
         <Text>Log Out</Text>
       </View>
     );
-  })
+  }),
 }));
 
 // Mock expo-location
 jest.mock('expo-location', () => ({
-  requestForegroundPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'granted' })),
-  getCurrentPositionAsync: jest.fn(() => Promise.resolve({ coords: { latitude: 0, longitude: 0 } }))
+  requestForegroundPermissionsAsync: jest.fn(() =>
+    Promise.resolve({ status: 'granted' })
+  ),
+  getCurrentPositionAsync: jest.fn(() =>
+    Promise.resolve({ coords: { latitude: 0, longitude: 0 } })
+  ),
 }));
 
 // Mock navigation
 const mockNavigate = jest.fn();
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
-    navigate: mockNavigate
-  })
+    navigate: mockNavigate,
+  }),
 }));
 
 describe('Home Component', () => {
@@ -130,7 +136,7 @@ describe('Home Component', () => {
       weather: null,
       alert: null,
       setWeather: jest.fn(),
-      setAlert: jest.fn()
+      setAlert: jest.fn(),
     });
   });
 
@@ -146,11 +152,11 @@ describe('Home Component', () => {
       weather: null,
       alert: null,
       setWeather: jest.fn(),
-      setAlert: jest.fn()
+      setAlert: jest.fn(),
     });
 
     const { getByText } = render(<Home />);
-    
+
     await waitFor(() => {
       expect(getByText(`Welcome, ${mockUser.name}!`)).toBeTruthy();
     });
@@ -158,7 +164,7 @@ describe('Home Component', () => {
 
   it('renders login message when user is not logged in', async () => {
     const { getByText } = render(<Home />);
-    
+
     await waitFor(() => {
       expect(getByText('Please log in!')).toBeTruthy();
     });
@@ -171,11 +177,11 @@ describe('Home Component', () => {
       weather: null,
       alert: null,
       setWeather: jest.fn(),
-      setAlert: jest.fn()
+      setAlert: jest.fn(),
     });
 
     const { getByTestId } = render(<Home />);
-    
+
     await waitFor(() => {
       expect(getByTestId('weather-card')).toBeTruthy();
       expect(getByTestId('alert-card')).toBeTruthy();
@@ -184,7 +190,7 @@ describe('Home Component', () => {
 
   it('does not render WeatherCard and AlertCard when user is not logged in', async () => {
     const { queryByTestId } = render(<Home />);
-    
+
     await waitFor(() => {
       expect(queryByTestId('weather-card')).toBeNull();
       expect(queryByTestId('alert-card')).toBeNull();
@@ -193,7 +199,7 @@ describe('Home Component', () => {
 
   it('navigates to login when user is not logged in', async () => {
     render(<Home />);
-    
+
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('LogIn');
       expect(consoleLogSpy).toHaveBeenCalledWith('user', null);
@@ -203,7 +209,7 @@ describe('Home Component', () => {
 
   it('handles login button press', async () => {
     const { getByTestId } = render(<Home />);
-    
+
     await waitFor(() => {
       const loginButton = getByTestId('login-button');
       fireEvent.press(loginButton);
@@ -218,11 +224,11 @@ describe('Home Component', () => {
       weather: null,
       alert: null,
       setWeather: jest.fn(),
-      setAlert: jest.fn()
+      setAlert: jest.fn(),
     });
 
     const { getByTestId } = render(<Home />);
-    
+
     await waitFor(() => {
       expect(getByTestId('logout-component')).toBeTruthy();
     });
@@ -230,7 +236,7 @@ describe('Home Component', () => {
 
   it('shows Login button when user is not logged in', async () => {
     const { getByTestId } = render(<Home />);
-    
+
     await waitFor(() => {
       expect(getByTestId('login-button')).toBeTruthy();
     });
@@ -244,13 +250,13 @@ describe('Home Component', () => {
       weather: null,
       alert: null,
       setWeather: jest.fn(),
-      setAlert: jest.fn()
+      setAlert: jest.fn(),
     });
 
     render(<Home />);
-    
+
     await waitFor(() => {
       expect(consoleLogSpy).toHaveBeenCalledWith('user', mockUser);
     });
   });
-}); 
+});

@@ -30,12 +30,8 @@ jest.mock('../app/components/Alerts', () => () => 'Alerts');
 jest.mock('../app/components/Notifications', () => () => 'Notifications');
 
 describe('MainTabs Component', () => {
-  const renderWithNavigation = (component) => {
-    return render(
-      <NavigationContainer>
-        {component}
-      </NavigationContainer>
-    );
+  const renderWithNavigation = component => {
+    return render(<NavigationContainer>{component}</NavigationContainer>);
   };
 
   test('renders Home, Alerts, Notifications, and Social tabs', () => {
@@ -68,10 +64,12 @@ describe('MainTabs Component', () => {
 
     // Test screenOptions with Home route
     const homeOptions = screenOptions({ route: { name: 'Home' } });
-    expect(homeOptions).toEqual(expect.objectContaining({
-      tabBarActiveTintColor: 'green',
-      tabBarInactiveTintColor: 'gray',
-    }));
+    expect(homeOptions).toEqual(
+      expect.objectContaining({
+        tabBarActiveTintColor: 'green',
+        tabBarInactiveTintColor: 'gray',
+      })
+    );
 
     // Test icon function for Home tab
     const homeIcon = homeOptions.tabBarIcon({ color: 'red', size: 20 });
@@ -97,18 +95,24 @@ describe('MainTabs Component', () => {
     const screenOptions = navigator.props.screenOptions;
 
     // Test Home tab icon
-    const homeIcon = screenOptions({ route: { name: 'Home' } })
-      .tabBarIcon({ color: 'black', size: 24 });
+    const homeIcon = screenOptions({ route: { name: 'Home' } }).tabBarIcon({
+      color: 'black',
+      size: 24,
+    });
     expect(homeIcon.props.name).toBe('home');
 
     // Test Social tab icon
-    const socialIcon = screenOptions({ route: { name: 'Social' } })
-      .tabBarIcon({ color: 'black', size: 24 });
+    const socialIcon = screenOptions({ route: { name: 'Social' } }).tabBarIcon({
+      color: 'black',
+      size: 24,
+    });
     expect(socialIcon.props.name).toBe('people');
-    
+
     // Test Alerts tab icon
-    const alertsIcon = screenOptions({ route: { name: 'Alerts' } })
-      .tabBarIcon({ color: 'black', size: 24 });
+    const alertsIcon = screenOptions({ route: { name: 'Alerts' } }).tabBarIcon({
+      color: 'black',
+      size: 24,
+    });
     expect(alertsIcon.props.name).toBe('alert-circle-outline');
   });
 
@@ -118,8 +122,9 @@ describe('MainTabs Component', () => {
     const screenOptions = navigator.props.screenOptions;
 
     // Test with unknown route name
-    const unknownIcon = screenOptions({ route: { name: 'Unknown' } })
-      .tabBarIcon({ color: 'black', size: 24 });
+    const unknownIcon = screenOptions({
+      route: { name: 'Unknown' },
+    }).tabBarIcon({ color: 'black', size: 24 });
     expect(unknownIcon.props.name).toBeUndefined();
   });
-}); 
+});

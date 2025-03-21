@@ -1,12 +1,19 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
+import {
+  describe,
+  it,
+  expect,
+  beforeEach,
+  afterEach,
+  jest,
+} from '@jest/globals';
 import Social from '../app/components/Social';
 import { useAppContext } from '../app/context/AppContext';
 
 // Mock the dependencies
 jest.mock('../app/context/AppContext', () => ({
-  useAppContext: jest.fn()
+  useAppContext: jest.fn(),
 }));
 
 jest.mock('../app/components/ContactList', () => 'MockContactList');
@@ -20,8 +27,8 @@ describe('Social Component', () => {
         id: 'test-user-id',
         name: 'Test User',
         email: 'test@example.com',
-        sub: 'auth0|12345'
-      }
+        sub: 'auth0|12345',
+      },
     });
   });
 
@@ -37,10 +44,10 @@ describe('Social Component', () => {
   it('renders login message when user is not present', () => {
     // Mock user as null
     useAppContext.mockReturnValueOnce({
-      user: null
+      user: null,
     });
 
     const { getByText } = render(<Social />);
     expect(getByText('Please log in!')).toBeTruthy();
   });
-}); 
+});

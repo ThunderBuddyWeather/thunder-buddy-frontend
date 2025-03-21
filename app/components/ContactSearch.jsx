@@ -17,14 +17,14 @@ export default function ContactSearch() {
 
     setStatus('pending');
     setServerMessage(null);
-    
+
     try {
       const currentUsername = user.nickname || user.name;
       const url = `${BASE_URL}/api/friendship/request/${currentUsername}+${friendCode}`;
-      
+
       const response = await fetch(url, { method: 'POST' });
       const data = await response.json();
-      
+
       if (response.ok) {
         setStatus('success');
         setServerMessage(data.message || 'Friend request sent!');
@@ -52,7 +52,9 @@ export default function ContactSearch() {
         {status === 'success' && <Text style={styles.checkmark}>✓</Text>}
       </View>
       {serverMessage && (
-        <Text style={[styles.serverMessage, status === 'error' && styles.error]}>
+        <Text
+          style={[styles.serverMessage, status === 'error' && styles.error]}
+        >
           {serverMessage}
         </Text>
       )}

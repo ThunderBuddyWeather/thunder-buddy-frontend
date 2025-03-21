@@ -1,8 +1,8 @@
 /* global it, expect */
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { Platform  } from 'react-native'; 
-import LogOut from '../app/components/LogOut'; 
+import { Platform } from 'react-native';
+import LogOut from '../app/components/LogOut';
 import { jest, describe, beforeEach } from '@jest/globals';
 
 // Create mock functions
@@ -14,33 +14,33 @@ const mockAlert = jest.fn();
 // Mock navigation
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
-    navigate: mockNavigate
-  })
+    navigate: mockNavigate,
+  }),
 }));
 
 // Mock AppContext
 jest.mock('../app/context/AppContext', () => ({
   useAppContext: () => ({
-    setUser: mockSetUser
-  })
+    setUser: mockSetUser,
+  }),
 }));
 
 // Mock expo-web-browser
 jest.mock('expo-web-browser', () => ({
-  openAuthSessionAsync: (...args) => mockOpenAuthSessionAsync(...args)
+  openAuthSessionAsync: (...args) => mockOpenAuthSessionAsync(...args),
 }));
 
 // Mock react-native components
 jest.mock('react-native', () => {
   const mockPlatform = {
     OS: 'web',
-    select: (obj) => obj.ios || obj.web || obj.default
+    select: obj => obj.ios || obj.web || obj.default,
   };
 
   return {
     Platform: mockPlatform,
     Alert: {
-      alert: mockAlert
+      alert: mockAlert,
     },
     StyleSheet: {
       create: styles => styles,
@@ -49,16 +49,20 @@ jest.mock('react-native', () => {
           return Object.assign({}, ...style);
         }
         return style || {};
-      }
+      },
     },
     TouchableOpacity: ({ onPress, children, testID, ...props }) => {
       const React = require('react');
-      return React.createElement('button', {
-        onClick: onPress,
-        'data-testid': testID,
-        testID,
-        ...props
-      }, children);
+      return React.createElement(
+        'button',
+        {
+          onClick: onPress,
+          'data-testid': testID,
+          testID,
+          ...props,
+        },
+        children
+      );
     },
     Text: ({ children, ...props }) => {
       const React = require('react');
@@ -67,7 +71,7 @@ jest.mock('react-native', () => {
     View: ({ children, ...props }) => {
       const React = require('react');
       return React.createElement('div', props, children);
-    }
+    },
   };
 });
 
@@ -75,23 +79,27 @@ jest.mock('react-native', () => {
 jest.mock('react-native-paper', () => ({
   Button: ({ onPress, children, testID, ...props }) => {
     const React = require('react');
-    return React.createElement('button', {
-      onClick: onPress,
-      'data-testid': testID,
-      testID,
-      ...props
-    }, children);
-  }
+    return React.createElement(
+      'button',
+      {
+        onClick: onPress,
+        'data-testid': testID,
+        testID,
+        ...props,
+      },
+      children
+    );
+  },
 }));
 
 // Mock window.location for web
 const mockLocation = {
   href: '',
-  origin: 'http://localhost:3000'
+  origin: 'http://localhost:3000',
 };
 Object.defineProperty(window, 'location', {
   value: mockLocation,
-  writable: true
+  writable: true,
 });
 
 describe('LogOut Component', () => {
@@ -119,23 +127,25 @@ describe('LogOut Component', () => {
     Platform.OS = 'web';
     const { getByTestId } = render(<LogOut />);
     const logoutButton = getByTestId('logout-button');
-    
+
     await fireEvent.press(logoutButton);
-    
+
     expect(mockSetUser).toHaveBeenCalledWith(null);
     expect(mockLocation.href).toContain('https://test.auth0.com/v2/logout');
-    expect(mockLocation.href).toContain('returnTo=http%3A%2F%2Flocalhost%3A3000');
+    expect(mockLocation.href).toContain(
+      'returnTo=http%3A%2F%2Flocalhost%3A3000'
+    );
   });
 
   it('handles logout on native platform', async () => {
     Platform.OS = 'ios';
     mockOpenAuthSessionAsync.mockResolvedValueOnce({ type: 'success' });
-    
+
     const { getByTestId } = render(<LogOut />);
     const logoutButton = getByTestId('logout-button');
-    
+
     await fireEvent.press(logoutButton);
-    
+
     expect(mockSetUser).toHaveBeenCalledWith(null);
     expect(mockOpenAuthSessionAsync).toHaveBeenCalledWith(
       expect.stringContaining('https://test.auth0.com/v2/logout?client_id='),
@@ -146,12 +156,12 @@ describe('LogOut Component', () => {
   it('handles logout cancellation on native platform', async () => {
     Platform.OS = 'ios';
     mockOpenAuthSessionAsync.mockResolvedValueOnce({ type: 'cancel' });
-    
+
     const { getByTestId } = render(<LogOut />);
     const logoutButton = getByTestId('logout-button');
-    
+
     await fireEvent.press(logoutButton);
-    
+
     expect(mockSetUser).toHaveBeenCalledWith(null);
     expect(mockOpenAuthSessionAsync).toHaveBeenCalled();
   });
@@ -164,12 +174,12 @@ describe('LogOut Component', () => {
     Platform.OS = 'ios';
     const mockError = new Error('Test error');
     mockOpenAuthSessionAsync.mockRejectedValueOnce(mockError);
-    
+
     const { getByTestId } = render(<LogOut />);
     const logoutButton = getByTestId('logout-button');
-    
+
     await fireEvent.press(logoutButton);
-    
+
     // Assert that the error was handled
     expect(console.error).toHaveBeenCalledWith('Logout error:', mockError);
     expect(mockSetUser).toHaveBeenCalledWith(null);
@@ -178,4 +188,4 @@ describe('LogOut Component', () => {
     // Restore console.error
     console.error = originalConsoleError;
   });
-}); 
+});

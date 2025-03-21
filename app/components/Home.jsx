@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { Text, SafeAreaView, ScrollView } from 'react-native';
 import { Button } from 'react-native-paper';
 import { useAppContext } from '../context/AppContext.jsx';
@@ -17,12 +17,12 @@ export default function Home() {
   };
 
   useEffect(() => {
-    console.log('user', user)
-    if(!user){
-      navigation.navigate('LogIn')
-      console.log('redirecting to login...')
+    console.log('user', user);
+    if (!user) {
+      navigation.navigate('LogIn');
+      console.log('redirecting to login...');
     }
-  }, [user, navigation])
+  }, [user, navigation]);
 
   const LogIn = () => (
     <Button
@@ -38,7 +38,7 @@ export default function Home() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
           flexDirection: 'column',

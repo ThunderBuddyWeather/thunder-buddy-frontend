@@ -1,11 +1,18 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import { jest, describe, beforeEach, afterEach, test, expect } from '@jest/globals';
+import {
+  jest,
+  describe,
+  beforeEach,
+  afterEach,
+  test,
+  expect,
+} from '@jest/globals';
 import ContactSearch from '../app/components/ContactSearch';
 
 // Mock the AppContext
 jest.mock('../app/context/AppContext', () => ({
-  useAppContext: jest.fn()
+  useAppContext: jest.fn(),
 }));
 
 // Mock fetch
@@ -16,8 +23,8 @@ jest.mock('react-native-paper', () => ({
   Card: 'MockCard',
   Avatar: {
     Image: 'MockAvatarImage',
-    Icon: 'MockAvatarIcon'
-  }
+    Icon: 'MockAvatarIcon',
+  },
 }));
 
 // Default mocked context values
@@ -27,21 +34,23 @@ const mockContextValue = {
     name: 'Test User',
     email: 'test@example.com',
     sub: 'auth0|12345',
-    nickname: 'testuser'
+    nickname: 'testuser',
   },
-  BASE_URL: 'https://api.example.com'
+  BASE_URL: 'https://api.example.com',
 };
 
 describe('ContactSearch Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Set up the default mock implementation for useAppContext
-    require('../app/context/AppContext').useAppContext.mockReturnValue(mockContextValue);
-    
+    require('../app/context/AppContext').useAppContext.mockReturnValue(
+      mockContextValue
+    );
+
     // Set up the default fetch success response
     global.fetch.mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ message: 'Friend request sent!' })
+      json: () => Promise.resolve({ message: 'Friend request sent!' }),
     });
   });
 
@@ -56,20 +65,20 @@ describe('ContactSearch Component', () => {
 
   test('handles input changes', () => {
     const { getByPlaceholderText } = render(<ContactSearch />);
-    
+
     const input = getByPlaceholderText('Username');
     fireEvent.changeText(input, 'test');
-    
+
     expect(input.props.value).toBe('test');
   });
 
   test('submits friend request when input is submitted', async () => {
     const { getByPlaceholderText } = render(<ContactSearch />);
-    
+
     const input = getByPlaceholderText('Username');
     fireEvent.changeText(input, 'friendname');
     fireEvent(input, 'submitEditing');
-    
+
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
         'https://api.example.com/api/friendship/request/testuser+friendname',
@@ -77,14 +86,14 @@ describe('ContactSearch Component', () => {
       );
     });
   });
-  
+
   test('does not submit when friend code is empty', async () => {
     const { getByPlaceholderText } = render(<ContactSearch />);
-    
+
     const input = getByPlaceholderText('Username');
     fireEvent.changeText(input, '   '); // Only whitespace
     fireEvent(input, 'submitEditing');
-    
+
     // The fetch should not be called
     expect(global.fetch).not.toHaveBeenCalled();
   });
@@ -93,15 +102,15 @@ describe('ContactSearch Component', () => {
     // Mock the context to return no user
     require('../app/context/AppContext').useAppContext.mockReturnValue({
       ...mockContextValue,
-      user: null
+      user: null,
     });
-    
+
     const { getByPlaceholderText, findByText } = render(<ContactSearch />);
-    
+
     const input = getByPlaceholderText('Username');
     fireEvent.changeText(input, 'friendname');
     fireEvent(input, 'submitEditing');
-    
+
     const errorMessage = await findByText('No logged-in user found.');
     expect(errorMessage).toBeTruthy();
     expect(global.fetch).not.toHaveBeenCalled();
@@ -109,22 +118,22 @@ describe('ContactSearch Component', () => {
 
   test('shows success message on successful request', async () => {
     const { getByPlaceholderText, findByText } = render(<ContactSearch />);
-    
+
     const input = getByPlaceholderText('Username');
     fireEvent.changeText(input, 'friendname');
     fireEvent(input, 'submitEditing');
-    
+
     const successMessage = await findByText('Friend request sent!');
     expect(successMessage).toBeTruthy();
   });
 
   test('shows success checkmark on successful request', async () => {
     const { getByPlaceholderText, findByText } = render(<ContactSearch />);
-    
+
     const input = getByPlaceholderText('Username');
     fireEvent.changeText(input, 'friendname');
     fireEvent(input, 'submitEditing');
-    
+
     // Find the checkmark
     const checkmark = await findByText('✓');
     expect(checkmark).toBeTruthy();
@@ -134,34 +143,32 @@ describe('ContactSearch Component', () => {
     // Mock a failed API response
     global.fetch.mockResolvedValue({
       ok: false,
-      json: () => Promise.resolve({ message: 'User not found' })
+      json: () => Promise.resolve({ message: 'User not found' }),
     });
-    
+
     const { getByPlaceholderText, findByText } = render(<ContactSearch />);
-    
+
     const input = getByPlaceholderText('Username');
     fireEvent.changeText(input, 'nonexistentuser');
     fireEvent(input, 'submitEditing');
-    
+
     const errorMessage = await findByText('User not found');
     expect(errorMessage).toBeTruthy();
     expect(errorMessage.props.style).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ color: 'red' })
-      ])
+      expect.arrayContaining([expect.objectContaining({ color: 'red' })])
     );
   });
 
   test('handles API network errors', async () => {
     // Mock a network error
     global.fetch.mockRejectedValue(new Error('Network error'));
-    
+
     const { getByPlaceholderText, findByText } = render(<ContactSearch />);
-    
+
     const input = getByPlaceholderText('Username');
     fireEvent.changeText(input, 'friendname');
     fireEvent(input, 'submitEditing');
-    
+
     const errorMessage = await findByText('Network error');
     expect(errorMessage).toBeTruthy();
   });
@@ -170,15 +177,15 @@ describe('ContactSearch Component', () => {
     // Mock a failed API response with no message
     global.fetch.mockResolvedValue({
       ok: false,
-      json: () => Promise.resolve({})
+      json: () => Promise.resolve({}),
     });
-    
+
     const { getByPlaceholderText, findByText } = render(<ContactSearch />);
-    
+
     const input = getByPlaceholderText('Username');
     fireEvent.changeText(input, 'friendname');
     fireEvent(input, 'submitEditing');
-    
+
     const errorMessage = await findByText('Failed to send friend request');
     expect(errorMessage).toBeTruthy();
   });
@@ -188,13 +195,13 @@ describe('ContactSearch Component', () => {
     const error = new Error();
     error.message = undefined;
     global.fetch.mockRejectedValue(error);
-    
+
     const { getByPlaceholderText, findByText } = render(<ContactSearch />);
-    
+
     const input = getByPlaceholderText('Username');
     fireEvent.changeText(input, 'friendname');
     fireEvent(input, 'submitEditing');
-    
+
     const errorMessage = await findByText('Something went wrong');
     expect(errorMessage).toBeTruthy();
   });

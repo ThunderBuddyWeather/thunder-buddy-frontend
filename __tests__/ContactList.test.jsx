@@ -1,7 +1,14 @@
 /* global describe, it, expect, jest */
 import React from 'react';
 import { render } from '@testing-library/react-native';
-import { describe, it, expect, jest, beforeEach, afterEach } from '@jest/globals';
+import {
+  describe,
+  it,
+  expect,
+  jest,
+  beforeEach,
+  afterEach,
+} from '@jest/globals';
 import ContactList from '../app/components/ContactList';
 import { useAppContext } from '../app/context/AppContext';
 
@@ -10,13 +17,13 @@ jest.mock('../app/queries', () => ({
   useFriends: jest.fn(() => ({
     data: [],
     isLoading: false,
-    error: null
-  }))
+    error: null,
+  })),
 }));
 
 // Mock the AppContext
 jest.mock('../app/context/AppContext', () => ({
-  useAppContext: jest.fn()
+  useAppContext: jest.fn(),
 }));
 
 // Mock components that ContactList depends on
@@ -26,28 +33,32 @@ jest.mock('react-native-paper', () => {
     return React.createElement('div', { style }, children);
   };
   MockCard.displayName = 'Card';
-  
+
   // Add Content as a property to MockCard
   const MockCardContent = ({ children, style }) => {
     const React = require('react');
     return React.createElement('div', { style }, children);
   };
   MockCardContent.displayName = 'Card.Content';
-  
+
   MockCard.Content = MockCardContent;
-  
+
   const MockAvatarIcon = ({ size, icon, style }) => {
     const React = require('react');
-    return React.createElement('div', { style, 'data-icon': icon, 'data-size': size }, null);
+    return React.createElement(
+      'div',
+      { style, 'data-icon': icon, 'data-size': size },
+      null
+    );
   };
   MockAvatarIcon.displayName = 'Avatar.Icon';
-  
+
   return {
     Card: MockCard,
     Avatar: {
       Icon: MockAvatarIcon,
-      Image: 'MockAvatarImage'
-    }
+      Image: 'MockAvatarImage',
+    },
   };
 });
 
@@ -57,20 +68,20 @@ describe('ContactList', () => {
       user_id: '1',
       name: 'John Doe',
       weather: {
-        icon: 'c01d'
+        icon: 'c01d',
       },
       alert: null,
-      picture: null
+      picture: null,
     },
     {
       user_id: '2',
       name: 'Jane Smith',
       weather: {
-        icon: 'r01d'
+        icon: 'r01d',
       },
       alert: 'Flood Warning',
-      picture: 'https://example.com/picture.jpg'
-    }
+      picture: 'https://example.com/picture.jpg',
+    },
   ];
 
   beforeEach(() => {
@@ -81,9 +92,9 @@ describe('ContactList', () => {
         name: 'Test User',
         email: 'test@example.com',
         sub: 'auth0|12345',
-        nickname: 'testuser'
+        nickname: 'testuser',
       },
-      BASE_URL: 'https://api.example.com'
+      BASE_URL: 'https://api.example.com',
     });
   });
 
@@ -106,9 +117,9 @@ describe('ContactList', () => {
     require('../app/queries').useFriends.mockReturnValueOnce({
       data: mockContacts,
       isLoading: false,
-      error: null
+      error: null,
     });
-    
+
     // Just test that the component renders successfully and useFriends was called
     render(<ContactList />);
     expect(require('../app/queries').useFriends).toHaveBeenCalled();
@@ -119,9 +130,9 @@ describe('ContactList', () => {
     require('../app/queries').useFriends.mockReturnValueOnce({
       data: null,
       isLoading: true,
-      error: null
+      error: null,
     });
-    
+
     const { queryByText } = render(<ContactList />);
     // Component should render without crashing
     expect(require('../app/queries').useFriends).toHaveBeenCalled();
@@ -132,11 +143,11 @@ describe('ContactList', () => {
     require('../app/queries').useFriends.mockReturnValueOnce({
       data: null,
       isLoading: false,
-      error: new Error('Failed to load contacts')
+      error: new Error('Failed to load contacts'),
     });
-    
+
     const { queryByText } = render(<ContactList />);
     // Component should render without crashing
     expect(require('../app/queries').useFriends).toHaveBeenCalled();
   });
-}); 
+});

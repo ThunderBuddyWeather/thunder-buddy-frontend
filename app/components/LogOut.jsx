@@ -12,40 +12,44 @@ export default function LogOut() {
   const handleLogout = async () => {
     setUser(null);
 
-    const returnTo = Platform.OS === 'web'
-      ? encodeURIComponent(window.location.origin)
-      : encodeURIComponent('myapp://auth'); 
+    const returnTo =
+      Platform.OS === 'web'
+        ? encodeURIComponent(window.location.origin)
+        : encodeURIComponent('myapp://auth');
 
     const logoutUrl = `https://${AUTH_DOMAIN}/v2/logout?client_id=${CLIENT_ID}&returnTo=${returnTo}`;
 
     try {
       if (Platform.OS === 'web') {
-        console.log("Logging out on web:", logoutUrl);
+        console.log('Logging out on web:', logoutUrl);
         window.location.href = logoutUrl;
       } else {
-        console.log("Logging out on Expo:", logoutUrl);
-        const result = await WebBrowser.openAuthSessionAsync(logoutUrl, returnTo);
-        console.log("Logout result on Expo:", result);
+        console.log('Logging out on Expo:', logoutUrl);
+        const result = await WebBrowser.openAuthSessionAsync(
+          logoutUrl,
+          returnTo
+        );
+        console.log('Logout result on Expo:', result);
 
         if (result.type === 'success') {
-          console.log("Logged out successfully on Expo");
+          console.log('Logged out successfully on Expo');
         } else if (result.type === 'cancel') {
-          console.warn("Logout was canceled on Expo");
+          console.warn('Logout was canceled on Expo');
         } else {
-          console.warn("Logout flow failed or was closed", result);
+          console.warn('Logout flow failed or was closed', result);
         }
       }
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error('Logout error:', error);
     }
   };
 
   return (
     <View style={styles.container}>
       {Platform.OS === 'ios' ? (
-        <TouchableOpacity 
-          onPress={handleLogout} 
-          activeOpacity={0.7} 
+        <TouchableOpacity
+          onPress={handleLogout}
+          activeOpacity={0.7}
           style={styles.button}
           testID="logout-button"
         >

@@ -7,14 +7,14 @@ import { pushUser } from '../app/queries';
 // Mock the external modules
 jest.mock('expo-location');
 jest.mock('../app/queries', () => ({
-  pushUser: jest.fn(() => Promise.resolve({ success: true }))
+  pushUser: jest.fn(() => Promise.resolve({ success: true })),
 }));
 
 // Create a mock for the original component
 jest.mock('../app/components/WeatherCard', () => {
   const React = require('react');
   const { Text, View, Button } = require('react-native');
-  
+
   // This is a simplified version of the component without problematic dependencies
   const MockedWeatherCard = () => {
     const [weatherData, setWeatherData] = React.useState({
@@ -24,9 +24,9 @@ jest.mock('../app/components/WeatherCard', () => {
       rh: 60,
       city_name: 'Dummy City',
     });
-    
+
     const [loading, setLoading] = React.useState(false);
-    
+
     // Use this to handle the fetch action
     React.useEffect(() => {
       if (loading) {
@@ -40,15 +40,15 @@ jest.mock('../app/components/WeatherCard', () => {
           });
           setLoading(false);
         }, 100);
-        
+
         return () => clearTimeout(timeoutId);
       }
     }, [loading]);
-    
+
     const fetchLiveWeather = () => {
       setLoading(true);
     };
-    
+
     return (
       <View>
         <Text>{weatherData.temp}°C</Text>
@@ -56,14 +56,14 @@ jest.mock('../app/components/WeatherCard', () => {
         <Text>City: {weatherData.city_name}</Text>
         <Text>Wind: {weatherData.wind_spd} m/s</Text>
         <Text>Humidity: {weatherData.rh}%</Text>
-        <Button 
-          title={loading ? "Fetching..." : "Get Live Weather"} 
-          onPress={fetchLiveWeather} 
+        <Button
+          title={loading ? 'Fetching...' : 'Get Live Weather'}
+          onPress={fetchLiveWeather}
         />
       </View>
     );
   };
-  
+
   return MockedWeatherCard;
 });
 
@@ -73,11 +73,13 @@ import WeatherCard from '../app/components/WeatherCard';
 describe('WeatherCard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Mock Location APIs
-    Location.requestForegroundPermissionsAsync.mockResolvedValue({ status: 'granted' });
+    Location.requestForegroundPermissionsAsync.mockResolvedValue({
+      status: 'granted',
+    });
     Location.getCurrentPositionAsync.mockResolvedValue({
-      coords: { latitude: 0, longitude: 0 }
+      coords: { latitude: 0, longitude: 0 },
     });
   });
 
@@ -87,7 +89,7 @@ describe('WeatherCard', () => {
 
   it('renders the weather data', () => {
     const { getByText } = render(<WeatherCard />);
-    
+
     // Check initial weather data is displayed
     expect(getByText('30°C')).toBeTruthy();
     expect(getByText('Sunny')).toBeTruthy();
@@ -104,17 +106,17 @@ describe('WeatherCard', () => {
 
   it('shows fetching state when button is pressed', () => {
     const { getByText } = render(<WeatherCard />);
-    
+
     // Initially the button should say "Get Live Weather"
     const button = getByText('Get Live Weather');
     expect(button).toBeTruthy();
-    
+
     // Wrap the button press in act
     act(() => {
       fireEvent.press(button);
     });
-    
+
     // After pressing, the button should say "Fetching..."
     expect(getByText('Fetching...')).toBeTruthy();
   });
-}); 
+});

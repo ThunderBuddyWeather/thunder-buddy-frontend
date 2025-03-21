@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Home from './Home';
 import Social from './Social';
 import Alerts from './Alerts';
-import Notifications from './Notifications'
+import Notifications from './Notifications';
 import { Ionicons } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
@@ -27,10 +27,26 @@ export default function MainTabs() {
         tabBarInactiveTintColor: 'gray',
       })}
     >
-      <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />
-      <Tab.Screen name="Alerts" component={Alerts} options={{ headerShown: false }} />
-      <Tab.Screen name="Notifications" component={Notifications} options={{ headerShown: false }} />
-      <Tab.Screen name="Social" component={Social} options={{ headerShown: false }} />
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Alerts"
+        component={Alerts}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Notifications"
+        component={Notifications}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Social"
+        component={Social}
+        options={{ headerShown: false }}
+      />
     </Tab.Navigator>
   );
 }

@@ -5,20 +5,21 @@ import { Platform, Alert } from 'react-native';
 
 const AppContext = createContext();
 
-const BASE_URL = Platform.OS === 'web'
-  ? "http://localhost:5000"
-  : `http://${process.env.DEV_IP}:5000`;
+const BASE_URL =
+  Platform.OS === 'web'
+    ? 'http://localhost:5000'
+    : `http://${process.env.DEV_IP}:5000`;
 
 console.log('BASE_URL:', BASE_URL);
 
 export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [weatherCoords, setWeatherCoords] = useState(null); 
+  const [weatherCoords, setWeatherCoords] = useState(null);
   const [alert, setAlert] = useState(null);
   const [authToken, setAuthToken] = useState(null);
   const [expoPushToken, setExpoPushToken] = useState(null);
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [setLoading] = useState(true);
 
   const getLocationAndWeather = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -43,22 +44,26 @@ export const AppProvider = ({ children }) => {
           lightColor: '#FF231F7C',
         });
       }
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
       if (existingStatus !== 'granted') {
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
       }
       if (finalStatus !== 'granted') {
-        Alert.alert('Permission Denied', 'Failed to get push token for push notifications!');
+        Alert.alert(
+          'Permission Denied',
+          'Failed to get push token for push notifications!'
+        );
         return;
       }
       const tokenData = await Notifications.getExpoPushTokenAsync();
       token = tokenData.data;
       setExpoPushToken(token);
-      console.log("Expo Push Token:", token);
+      console.log('Expo Push Token:', token);
     } catch (error) {
-      console.error("Error while registering for push notifications:", error);
+      console.error('Error while registering for push notifications:', error);
     }
   };
 
@@ -74,7 +79,7 @@ export const AppProvider = ({ children }) => {
       value={{
         user,
         setUser,
-        weatherCoords, 
+        weatherCoords,
         alert,
         setAlert,
         authToken,
@@ -82,7 +87,7 @@ export const AppProvider = ({ children }) => {
         expoPushToken,
         initialLoadComplete,
         setInitialLoadComplete,
-        BASE_URL, 
+        BASE_URL,
       }}
     >
       {children}

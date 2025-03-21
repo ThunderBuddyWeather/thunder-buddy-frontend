@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, Button } from 'react-native';
 import { useAppContext } from '../context/AppContext';
-import { pushUser } from '../queries';  
+import { pushUser } from '../queries';
 
 const dummyWeather = {
   weather: { description: 'Sunny', icon: 'c01d' },
@@ -12,7 +12,8 @@ const dummyWeather = {
 };
 
 export default function WeatherCard() {
-  const { weatherCoords, API_KEY, authToken, user, BASE_URL, expoPushToken } = useAppContext();
+  const { weatherCoords, API_KEY, authToken, user, BASE_URL, expoPushToken } =
+    useAppContext();
   const [weatherData, setWeatherData] = useState(dummyWeather);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -45,17 +46,19 @@ export default function WeatherCard() {
         user_username: user.nickname || user.name,
         user_name: user.name,
         user_email: user.email,
-        user_phone: user.phone || "",
-        user_address: user.address || "",
-        user_location: weatherCoords ? `${weatherCoords.latitude} ${weatherCoords.longitude}` : "",
+        user_phone: user.phone || '',
+        user_address: user.address || '',
+        user_location: weatherCoords
+          ? `${weatherCoords.latitude} ${weatherCoords.longitude}`
+          : '',
         expo_push_token: expoPushToken,
       };
       pushUser({ payload, BASE_URL, authToken })
-        .then((data) => {
-          console.log("User pushed successfully:", data);
+        .then(data => {
+          console.log('User pushed successfully:', data);
         })
-        .catch((err) => {
-          console.error("Error pushing user:", err);
+        .catch(err => {
+          console.error('Error pushing user:', err);
         });
     }
   }, [weatherData]);
@@ -86,7 +89,7 @@ export default function WeatherCard() {
       <Text style={styles.info}>Humidity: {humidity}%</Text>
       {error && <Text style={{ color: 'red' }}>{error}</Text>}
       <Button
-        title={loading ? "Fetching..." : "Get Live Weather"}
+        title={loading ? 'Fetching...' : 'Get Live Weather'}
         onPress={fetchLiveWeather}
         disabled={loading}
       />

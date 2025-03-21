@@ -16,7 +16,7 @@ const linking = {
     'http://localhost:8081',
     'exp://192.168.1.59:8081',
     'myapp://',
-    Linking.createURL('/')
+    Linking.createURL('/'),
   ],
   config: {
     screens: {
@@ -27,7 +27,7 @@ const linking = {
           Home: 'home',
           Alerts: 'alerts',
           Social: 'social',
-          Notifications: 'notifications'
+          Notifications: 'notifications',
         },
       },
     },
@@ -37,7 +37,10 @@ const linking = {
 function RootNavigator() {
   const { user } = useAppContext();
   return (
-    <Stack.Navigator initialRouteName="LogIn" screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      initialRouteName="LogIn"
+      screenOptions={{ headerShown: false }}
+    >
       {!user ? (
         <>
           <Stack.Screen name="LogIn" component={LogIn} />
@@ -47,9 +50,8 @@ function RootNavigator() {
         <Stack.Screen name="Main" component={MainTabs} />
       )}
     </Stack.Navigator>
-   );
+  );
 }
-
 
 const queryClient = new QueryClient();
 
@@ -62,7 +64,7 @@ export default function App() {
             <RootNavigator />
           </NavigationContainer>
         </AppProvider>
-    </QueryClientProvider>
+      </QueryClientProvider>
     </PaperProvider>
   );
 }

@@ -6,8 +6,12 @@ import { useAppContext } from '../context/AppContext';
 
 export default function ContactList() {
   const { user, BASE_URL } = useAppContext();
-  const currentUsername = user ? (user.nickname || user.name) : null;
-  const { data: friends, isLoading, error } = useFriends(currentUsername, BASE_URL);
+  const currentUsername = user ? user.nickname || user.name : null;
+  const {
+    data: friends,
+    isLoading,
+    error,
+  } = useFriends(currentUsername, BASE_URL);
 
   if (isLoading) return <Text>Loading contacts...</Text>;
   if (error) return <Text>Error loading contacts: {error.message}</Text>;
@@ -36,7 +40,7 @@ export default function ContactList() {
     <View style={styles.container}>
       <Text style={styles.title}>Contacts</Text>
       <ScrollView style={styles.scrollContainer}>
-        {friends.map((contact) => (
+        {friends.map(contact => (
           <ContactCard key={contact.user_id} contact={contact} />
         ))}
       </ScrollView>

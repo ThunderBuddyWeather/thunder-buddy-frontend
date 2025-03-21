@@ -25,10 +25,10 @@ Follow these instructions to clone the repository and set up the project for loc
 
 1. **Clone the Repository**
 
-  ```bash
-  git clone <repository-url>
-  cd ThunderBuddyFrontend
-  ```
+```bash
+git clone <repository-url>
+cd ThunderBuddyFrontend
+```
 
 2. **Install Dependencies**
 

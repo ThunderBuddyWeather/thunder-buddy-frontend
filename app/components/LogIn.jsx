@@ -21,7 +21,7 @@ export default function LogIn() {
   };
 
   const redirectUri = getRedirectUri();
-  console.log("Configured redirect URI:", redirectUri);
+  console.log('Configured redirect URI:', redirectUri);
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
@@ -30,7 +30,7 @@ export default function LogIn() {
       redirectUri,
       responseType: AuthSession.ResponseType.Code,
       extraParams: {
-        audience: `https://${AUTH_DOMAIN}/api/v2/`
+        audience: `https://${AUTH_DOMAIN}/api/v2/`,
       },
     },
     {
@@ -42,15 +42,15 @@ export default function LogIn() {
   React.useEffect(() => {
     const handleAuthResponse = async () => {
       if (response?.type === 'success' && response.params.code) {
-        console.log("Mobile login success, code:", response.params.code);
+        console.log('Mobile login success, code:', response.params.code);
         navigation.navigate('AuthRedirect', {
           code: response.params.code,
           codeVerifier: request.codeVerifier,
         });
       } else if (response?.type === 'error') {
-        console.error("Mobile auth error:", response.error);
+        console.error('Mobile auth error:', response.error);
       } else if (response?.type) {
-        console.log("Auth response:", response);
+        console.log('Auth response:', response);
       }
     };
 
@@ -58,7 +58,7 @@ export default function LogIn() {
   }, [response, navigation, request]);
 
   const handleLogin = async () => {
-    console.log("Initiating auth session...");
+    console.log('Initiating auth session...');
 
     if (Platform.OS === 'web') {
       const params = new URLSearchParams({
@@ -66,13 +66,13 @@ export default function LogIn() {
         scope: 'openid profile email',
         response_type: 'code',
         redirect_uri: redirectUri,
-        audience: `https://${AUTH_DOMAIN}/api/v2/`
+        audience: `https://${AUTH_DOMAIN}/api/v2/`,
       });
       const authUrl = `https://${AUTH_DOMAIN}/authorize?${params.toString()}`;
-      console.log("Web auth URL:", authUrl);
+      console.log('Web auth URL:', authUrl);
       window.location.href = authUrl;
     } else {
-      console.log("Starting mobile auth flow with useAuthRequest");
+      console.log('Starting mobile auth flow with useAuthRequest');
       await promptAsync();
     }
   };

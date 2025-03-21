@@ -8,28 +8,28 @@ import jwt_decode from 'jwt-decode';
 // Mock auth0-config
 jest.mock('../auth0-config', () => ({
   AUTH_DOMAIN: 'test.auth0.com',
-  CLIENT_ID: 'test-client-id'
+  CLIENT_ID: 'test-client-id',
 }));
 
 // Mock Platform
 jest.mock('react-native', () => ({
   Platform: {
-    OS: 'ios'
-  }
+    OS: 'ios',
+  },
 }));
 
 // Mock navigation
 const mockNavigate = jest.fn();
 let mockRouteParams = {
   code: 'test_code',
-  codeVerifier: 'test_verifier'
+  codeVerifier: 'test_verifier',
 };
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
   useRoute: () => ({
-    params: mockRouteParams
-  })
+    params: mockRouteParams,
+  }),
 }));
 
 // Mock jwt_decode
@@ -41,12 +41,12 @@ global.fetch = jest.fn();
 // Mock AuthSession
 jest.mock('expo-auth-session', () => ({
   makeRedirectUri: jest.fn(() => 'test_redirect_uri'),
-  getRedirectUrl: jest.fn(() => ({ codeVerifier: 'test_verifier' }))
+  getRedirectUrl: jest.fn(() => ({ codeVerifier: 'test_verifier' })),
 }));
 
 // Mock AppContext
 jest.mock('../app/context/AppContext', () => ({
-  useAppContext: jest.fn()
+  useAppContext: jest.fn(),
 }));
 
 describe('AuthRedirect Component', () => {
@@ -64,14 +64,14 @@ describe('AuthRedirect Component', () => {
     console.error = jest.fn();
 
     mockUser = null;
-    mockSetUser = jest.fn((newUser) => {
+    mockSetUser = jest.fn(newUser => {
       mockUser = newUser;
     });
     mockSetAuthToken = jest.fn();
-    
+
     mockRouteParams = {
       code: 'test_code',
-      codeVerifier: 'test_verifier'
+      codeVerifier: 'test_verifier',
     };
 
     // Save original window object
@@ -81,24 +81,24 @@ describe('AuthRedirect Component', () => {
       location: {
         search: '?code=test_code&code_verifier=test_verifier',
         history: {
-          replaceState: jest.fn()
-        }
-      }
+          replaceState: jest.fn(),
+        },
+      },
     };
 
     jwt_decode.mockReturnValue(mockUserData);
     global.fetch.mockImplementation(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ id_token: 'test_token' })
+        json: () => Promise.resolve({ id_token: 'test_token' }),
       })
     );
-    
+
     // Mock useAppContext with all required values
     useAppContext.mockImplementation(() => ({
       user: mockUser,
       setUser: mockSetUser,
-      setAuthToken: mockSetAuthToken
+      setAuthToken: mockSetAuthToken,
     }));
   });
 
@@ -116,7 +116,7 @@ describe('AuthRedirect Component', () => {
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
-    
+
     // Force a second render cycle to handle authAttempted change
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -134,7 +134,7 @@ describe('AuthRedirect Component', () => {
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
-    
+
     // Force a second render cycle to handle authAttempted change
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -149,7 +149,7 @@ describe('AuthRedirect Component', () => {
     global.fetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: false,
-        text: () => Promise.resolve('Token exchange failed')
+        text: () => Promise.resolve('Token exchange failed'),
       })
     );
 
@@ -159,7 +159,7 @@ describe('AuthRedirect Component', () => {
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
-    
+
     // Force a second render cycle to handle authAttempted change
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -183,7 +183,7 @@ describe('AuthRedirect Component', () => {
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
-    
+
     // Force a second render cycle to handle authAttempted change
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -204,7 +204,7 @@ describe('AuthRedirect Component', () => {
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
-    
+
     // Force a second render cycle to handle authAttempted change
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -224,7 +224,7 @@ describe('AuthRedirect Component', () => {
     useAppContext.mockImplementation(() => ({
       user: mockUser,
       setUser: mockSetUser,
-      setAuthToken: mockSetAuthToken
+      setAuthToken: mockSetAuthToken,
     }));
 
     render(<AuthRedirect />);
@@ -233,7 +233,7 @@ describe('AuthRedirect Component', () => {
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
-    
+
     // Force a second render cycle to handle authAttempted change
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -241,4 +241,4 @@ describe('AuthRedirect Component', () => {
 
     expect(mockNavigate).toHaveBeenCalledWith('Home');
   });
-}); 
+});
