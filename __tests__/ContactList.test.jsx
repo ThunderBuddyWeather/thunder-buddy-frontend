@@ -20,13 +20,36 @@ jest.mock('../app/context/AppContext', () => ({
 }));
 
 // Mock components that ContactList depends on
-jest.mock('react-native-paper', () => ({
-  Card: 'MockCard',
-  Avatar: {
-    Icon: 'MockAvatarIcon',
-    Image: 'MockAvatarImage'
-  }
-}));
+jest.mock('react-native-paper', () => {
+  const MockCard = ({ children, style }) => {
+    const React = require('react');
+    return React.createElement('div', { style }, children);
+  };
+  MockCard.displayName = 'Card';
+  
+  // Add Content as a property to MockCard
+  const MockCardContent = ({ children, style }) => {
+    const React = require('react');
+    return React.createElement('div', { style }, children);
+  };
+  MockCardContent.displayName = 'Card.Content';
+  
+  MockCard.Content = MockCardContent;
+  
+  const MockAvatarIcon = ({ size, icon, style }) => {
+    const React = require('react');
+    return React.createElement('div', { style, 'data-icon': icon, 'data-size': size }, null);
+  };
+  MockAvatarIcon.displayName = 'Avatar.Icon';
+  
+  return {
+    Card: MockCard,
+    Avatar: {
+      Icon: MockAvatarIcon,
+      Image: 'MockAvatarImage'
+    }
+  };
+});
 
 describe('ContactList', () => {
   const mockContacts = [
