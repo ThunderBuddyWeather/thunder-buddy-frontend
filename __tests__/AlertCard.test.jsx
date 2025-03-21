@@ -4,12 +4,13 @@ import { render, fireEvent, act, waitFor } from '@testing-library/react-native';
 import { Linking, View, Text as RNText } from 'react-native';
 import AlertCard from '../app/components/AlertCard';
 import { useAppContext } from '../app/context/AppContext';
-import { createContext } from 'react';
 
-const AppContext = createContext();
+// Define mock data for AppContext
 
-// Mock the AppContext
+// Mock the setAlert function
 const mockSetAlert = jest.fn();
+
+// Mock the weather object
 const mockWeather = {
   lat: 40.7128,
   lon: -74.006,
@@ -23,6 +24,7 @@ const mockUser = {
   email: 'test@example.com',
 };
 
+// Mock the useAppContext hook
 jest.mock('../app/context/AppContext', () => ({
   useAppContext: jest.fn(() => ({
     weather: mockWeather,
@@ -62,6 +64,7 @@ const Card = ({ children, style }) => (
 );
 Card.displayName = 'Card';
 
+// Create Card.Title component with all necessary subcomponents
 Card.Title = ({ title, subtitle, left, testID }) => (
   <View testID={testID || 'card-title'}>
     {left && left()}
@@ -71,16 +74,20 @@ Card.Title = ({ title, subtitle, left, testID }) => (
 );
 Card.Title.displayName = 'Card.Title';
 
+// Create Card.Content component with all necessary subcomponents
 Card.Content = ({ children }) => <View testID="card-content">{children}</View>;
 Card.Content.displayName = 'Card.Content';
 
+// Create Portal component with all necessary subcomponents
 const Portal = ({ children }) => <View testID="portal">{children}</View>;
 Portal.displayName = 'Portal';
 
+// Create Modal component with all necessary subcomponents
 const Modal = ({ visible, children }) =>
   visible ? <View testID="modal">{children}</View> : null;
 Modal.displayName = 'Modal';
 
+// Create Button component with all necessary subcomponents
 const Button = ({ onPress, children, style }) => (
   <View testID="button" style={style} onPress={onPress}>
     {children}
@@ -88,12 +95,15 @@ const Button = ({ onPress, children, style }) => (
 );
 Button.displayName = 'Button';
 
+// Create Avatar.Icon component with all necessary subcomponents
 const Avatar = { Icon: ({ icon }) => <View testID="avatar-icon">{icon}</View> };
 Avatar.Icon.displayName = 'Avatar.Icon';
 
+// Create Divider component with all necessary subcomponents
 const Divider = ({ style }) => <View testID="divider" style={style} />;
 Divider.displayName = 'Divider';
 
+// Create Text component with all necessary subcomponents
 const Text = ({ children, style }) => (
   <RNText testID="text" style={style}>
     {children}
@@ -101,6 +111,7 @@ const Text = ({ children, style }) => (
 );
 Text.displayName = 'Text';
 
+// Mock react-native-paper
 jest.mock('react-native-paper', () => ({
   Card,
   Portal,
@@ -136,6 +147,7 @@ describe('AlertCard Component', () => {
     }));
   });
 
+  // Test case 1: Renders without alerts when no alert is present
   it('renders without alerts when no alert is present', () => {
     const { getByTestId, queryByText } = render(<AlertCard />);
     // According to the component code, it doesn't show "No active alerts" but just
@@ -144,6 +156,7 @@ describe('AlertCard Component', () => {
     expect(getByTestId('button')).toBeTruthy();
   });
 
+  // Test case 2: Renders alert card when alert is present
   it('renders alert card when alert is present', async () => {
     useAppContext.mockImplementation(() => ({
       weather: mockWeather,
@@ -159,6 +172,7 @@ describe('AlertCard Component', () => {
     });
   });
 
+  // Test case 3: Opens modal when alert card is pressed
   it('opens modal when alert card is pressed', async () => {
     useAppContext.mockImplementation(() => ({
       weather: mockWeather,
@@ -184,6 +198,7 @@ describe('AlertCard Component', () => {
     expect(queryByTestId('modal')).toBeTruthy();
   });
 
+  // Test case 4: Opens external link when View Official Alert is pressed
   it('opens external link when View Official Alert is pressed', async () => {
     useAppContext.mockImplementation(() => ({
       weather: mockWeather,
@@ -214,6 +229,7 @@ describe('AlertCard Component', () => {
     expect(Linking.openURL).toHaveBeenCalledWith(mockAlert.uri);
   });
 
+  // Test case 5: Fetches alerts when weather data is available
   it('fetches alerts when weather data is available', async () => {
     const mockResponse = {
       ok: true,
@@ -233,6 +249,7 @@ describe('AlertCard Component', () => {
     );
   });
 
+  // Test case 6: Sets dummy alert when Use Dummy Alert button is pressed
   it('sets dummy alert when Use Dummy Alert button is pressed', async () => {
     const mockSetAlert = jest.fn();
     useAppContext.mockReturnValue({
@@ -259,6 +276,7 @@ describe('AlertCard Component', () => {
     expect(dummyAlert).toHaveProperty('title');
   });
 
+  // Test case 7: Handles API error correctly
   it('handles API error correctly', async () => {
     // Mock the weather context with all required properties
     const mockWeatherCoords = {
@@ -302,6 +320,7 @@ describe('AlertCard Component', () => {
     console.log = originalConsoleLog;
   });
 
+  // Test case 8: Handles case when weather data is missing
   it('handles case when weather data is missing', async () => {
     // Mock missing weather data
     useAppContext.mockReturnValue({
@@ -333,6 +352,7 @@ describe('AlertCard Component', () => {
     console.log = originalConsoleLog;
   });
 
+  // Test case 9: Handles case when weather.lat is missing
   it('handles case when weather.lat is missing', async () => {
     // Mock missing lat
     useAppContext.mockReturnValue({
@@ -364,6 +384,7 @@ describe('AlertCard Component', () => {
     console.log = originalConsoleLog;
   });
 
+  // Test case 10: Handles unsuccessful API response
   it('handles unsuccessful API response', async () => {
     // Mock a failed API response
     const errorResponse = { error: 'Invalid API key', code: 403 };
@@ -395,6 +416,7 @@ describe('AlertCard Component', () => {
     console.log = originalConsoleLog;
   });
 
+  // Test case 11: Closes modal when Close button is pressed
   it('closes modal when Close button is pressed', async () => {
     useAppContext.mockImplementation(() => ({
       weather: mockWeather,
@@ -427,6 +449,7 @@ describe('AlertCard Component', () => {
     expect(queryByTestId('modal')).toBeNull();
   });
 
+  // Test case 12: Displays alert information correctly in the modal  
   it('displays alert information correctly in the modal', async () => {
     useAppContext.mockImplementation(() => ({
       weather: mockWeather,
