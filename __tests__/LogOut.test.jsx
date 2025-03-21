@@ -123,7 +123,7 @@ describe('LogOut Component', () => {
     await fireEvent.press(logoutButton);
     
     expect(mockSetUser).toHaveBeenCalledWith(null);
-    expect(mockLocation.href).toContain('https://dev-qzpcmpfoi3fsel2m.us.auth0.com/v2/logout');
+    expect(mockLocation.href).toContain('https://test.auth0.com/v2/logout');
     expect(mockLocation.href).toContain('returnTo=http%3A%2F%2Flocalhost%3A3000');
   });
 
@@ -138,7 +138,7 @@ describe('LogOut Component', () => {
     
     expect(mockSetUser).toHaveBeenCalledWith(null);
     expect(mockOpenAuthSessionAsync).toHaveBeenCalledWith(
-      expect.stringContaining('https://dev-qzpcmpfoi3fsel2m.us.auth0.com/v2/logout?client_id='),
+      expect.stringContaining('https://test.auth0.com/v2/logout?client_id='),
       'myapp%3A%2F%2Fauth'
     );
   });
