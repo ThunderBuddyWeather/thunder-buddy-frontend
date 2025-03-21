@@ -2,7 +2,10 @@
 import React from 'react';
 import { render, fireEvent, act } from '@testing-library/react-native';
 import * as Location from 'expo-location';
-import { pushUser } from '../app/queries';
+// Remove unused import: import { pushUser } from '../app/queries';
+
+// Import the mocked component at the top
+import WeatherCard from '../app/components/WeatherCard';
 
 // Mock the external modules
 jest.mock('expo-location');
@@ -66,9 +69,6 @@ jest.mock('../app/components/WeatherCard', () => {
 
   return MockedWeatherCard;
 });
-
-// Import the mocked component
-import WeatherCard from '../app/components/WeatherCard';
 
 describe('WeatherCard', () => {
   beforeEach(() => {

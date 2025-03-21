@@ -1,4 +1,4 @@
-/* global describe, it, expect, jest */
+/* global */
 import React from 'react';
 import { render } from '@testing-library/react-native';
 import {
@@ -108,8 +108,8 @@ describe('ContactList', () => {
   });
 
   it('renders an empty list when no contacts are provided', () => {
-    const { queryByText } = render(<ContactList />);
-    expect(queryByText('John Doe')).toBeNull();
+    const { queryByText: query } = render(<ContactList />);
+    expect(query('John Doe')).toBeNull();
   });
 
   it('renders contact cards with names', () => {
@@ -133,7 +133,7 @@ describe('ContactList', () => {
       error: null,
     });
 
-    const { queryByText } = render(<ContactList />);
+    render(<ContactList />);
     // Component should render without crashing
     expect(require('../app/queries').useFriends).toHaveBeenCalled();
   });
@@ -146,7 +146,7 @@ describe('ContactList', () => {
       error: new Error('Failed to load contacts'),
     });
 
-    const { queryByText } = render(<ContactList />);
+    render(<ContactList />);
     // Component should render without crashing
     expect(require('../app/queries').useFriends).toHaveBeenCalled();
   });
